@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Артист - LABEL 52</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="artist-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="index.html">
+                    <h2>LABEL 52</h2>
+                </a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html#home" class="nav-link">Главная</a></li>
+                <li><a href="index.html#artists" class="nav-link">Артисты</a></li>
+                <li><a href="index.html#releases" class="nav-link">Релизы</a></li>
+                <li><a href="index.html#about" class="nav-link">О нас</a></li>
+                <li><a href="index.html#contact" class="nav-link">Контакты</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Главная секция артиста -->
+    <section class="artist-hero">
+        <div class="container">
+            <div class="artist-profile">
+                <div class="artist-avatar">
+                    <div class="avatar-placeholder">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="online-status">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Онлайн</span>
+                    </div>
+                </div>
+                <div class="artist-info">
+                    <h1 class="artist-name">NICKNAME</h1>
+                    <p class="artist-description">Профессиональный игрок и музыкант</p>
+                    <div class="artist-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="elo-value">0</div>
+                            <div class="stat-label">ELO</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="level-value">0</div>
+                            <div class="stat-label">Уровень</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="matches-value">0</div>
+                            <div class="stat-label">Матчи</div>
+                        </div>
+                    </div>
+                    <div class="artist-actions">
+                        <a href="#" class="btn btn-primary" id="faceit-link" target="_blank">
+                            <i class="fab fa-steam"></i>
+                            FACEIT Профиль
+                        </a>
+                        <a href="#" class="btn btn-secondary">
+                            <i class="fab fa-spotify"></i>
+                            Музыка
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Секция статистики -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Победы</h3>
+                        <div class="stat-number" id="wins-value">0</div>
+                        <div class="stat-percentage" id="win-rate">0%</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-crosshairs"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>K/D Ratio</h3>
+                        <div class="stat-number" id="kd-ratio">0.00</div>
+                        <div class="stat-label">Убийств/Смертей</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Точность</h3>
+                        <div class="stat-number" id="accuracy">0%</div>
+                        <div class="stat-label">Попаданий</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Серия побед</h3>
+                        <div class="stat-number" id="win-streak">0</div>
+                        <div class="stat-label">Подряд</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Секция последних матчей -->
+    <section class="matches-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Последние матчи</h2>
+                <p>Результаты последних игр</p>
+            </div>
+            <div class="matches-list" id="matches-list">
+                <!-- Матчи будут загружены через JavaScript -->
+                <div class="loading-matches">
+                    <div class="spinner"></div>
+                    <p>Загрузка матчей...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Секция достижений -->
+    <section class="achievements-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Достижения</h2>
+                <p>Особые награды и достижения</p>
+            </div>
+            <div class="achievements-grid" id="achievements-grid">
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <h3>Чемпион</h3>
+                    <p>Победа в турнире</p>
+                </div>
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3>MVP</h3>
+                    <p>Лучший игрок матча</p>
+                </div>
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3>Восхождение</h3>
+                    <p>Быстрый рост ELO</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Футер -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h3>LABEL 52</h3>
+                    <p>Музыка будущего</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h4>Лейбл</h4>
+                        <ul>
+                            <li><a href="index.html#about">О нас</a></li>
+                            <li><a href="index.html#artists">Артисты</a></li>
+                            <li><a href="index.html#releases">Релизы</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Поддержка</h4>
+                        <ul>
+                            <li><a href="index.html#contact">Контакты</a></li>
+                            <li><a href="#">FAQ</a></li>
+                            <li><a href="#">Прайваси</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 LABEL 52. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Модальное окно для настройки -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Настройки профиля</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="faceit-nickname">FACEIT никнейм:</label>
+                    <input type="text" id="faceit-nickname" placeholder="Введите ваш FACEIT никнейм">
+                </div>
+                <div class="form-group">
+                    <label for="artist-name">Имя артиста:</label>
+                    <input type="text" id="artist-name" placeholder="Введите имя артиста">
+                </div>
+                <div class="form-group">
+                    <label for="artist-description">Описание:</label>
+                    <textarea id="artist-description" placeholder="Краткое описание артиста"></textarea>
+                </div>
+                <button class="btn btn-primary" id="save-settings">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Кнопка настроек -->
+    <button class="settings-btn" id="settings-btn">
+        <i class="fas fa-cog"></i>
+    </button>
+
+    <script src="script.js"></script>
+    <script src="artist-script.js"></script>
+</body>
+</html>
