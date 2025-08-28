@@ -1,196 +1,178 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FACEIT Рейтинг - LABEL 52</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="faceit-ranking-styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <meta charset="utf-8" />
+  <title>FACEIT рейтинг — LABEL 52</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Единый список игроков и их FACEIT рейтинг" />
+  <style>
+    :root { color-scheme: dark; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif; background: #0b0b10; color: #eaeaf0; }
+    .wrap { max-width: 1100px; margin: 40px auto; padding: 0 16px; }
+    h1 { font-size: 28px; margin: 0 0 16px; }
+    p.note { opacity: .75; margin: 0 0 24px; font-size: 14px; }
+    .table-wrap { overflow-x: auto; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; background: rgba(255,255,255,.03); }
+    table { width: 100%; border-collapse: collapse; min-width: 720px; }
+    thead th { text-align: left; font-weight: 600; font-size: 14px; letter-spacing: .02em; padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,.06); }
+    tbody td { padding: 12px 14px; border-bottom: 1px dotted rgba(255,255,255,.06); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    .player { display: flex; align-items: center; gap: 10px; }
+    .avatar { width: 28px; height: 28px; border-radius: 16px; object-fit: cover; border: 1px solid rgba(255,255,255,.12); }
+    a { color: #a5c9ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .muted { opacity: .7; }
+    .loading { padding: 14px; text-align: center; }
+    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+  </style>
 </head>
 <body>
-    <!-- Навигация -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <h2><a href="index.html" style="color: inherit; text-decoration: none;">LABEL 52</a></h2>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="nav-link">Главная</a></li>
-                <li><a href="faceit-ranking.html" class="nav-link active">FACEIT Рейтинг</a></li>
-                <li><a href="spotify-stats.html" class="nav-link">Spotify Статистика</a></li>
-            </ul>
-            <div class="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
-        </div>
-    </nav>
+  <div class="wrap">
+    <h1>FACEIT рейтинг (единый список)</h1>
+    <p class="note">Список игроков берётся из БД, а данные подтягиваются по нику из FACEIT API. Видят одинаковое <strong>все</strong>.</p>
 
-    <!-- Главный контент -->
-    <main class="main-content">
-        <!-- Заголовок страницы -->
-        <section class="page-header">
-            <div class="container">
-                <h1 class="page-title">
-                    <span class="gradient-text">FACEIT</span> Рейтинг
-                </h1>
-                <p class="page-description">
-                    Отслеживайте статистику ваших друзей в CS2
-                </p>
-            </div>
-        </section>
-
-        <!-- Фильтры и поиск -->
-        <section class="filters-section">
-            <div class="container">
-                <div class="filters-container">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="player-search" placeholder="Поиск игрока...">
-                    </div>
-                    <div class="filter-buttons">
-                        <button class="filter-btn active" data-filter="all">Все</button>
-                        <button class="filter-btn" data-filter="music">Музыка</button>
-                        <button class="filter-btn" data-filter="black">Черные</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Рейтинг игроков -->
-        <section class="ranking-section">
-            <div class="container">
-                <div class="ranking-header">
-                    <h2>Рейтинг игроков</h2>
-                    <div class="ranking-stats">
-                        <span class="stat-item">
-                            <i class="fas fa-users"></i>
-                            <span id="total-players">0</span> игроков
-                        </span>
-
-                    </div>
-                </div>
-
-                <div class="ranking-table-container">
-                    <table class="ranking-table">
-                        <thead>
-                            <tr>
-                                <th>Место</th>
-                                <th>Игрок</th>
-                                <th class="sortable" data-sort="elo">
-                                    ELO
-                                    <i class="fas fa-sort sort-icon"></i>
-                                </th>
-                                <th>Уровень</th>
-                                <th class="sortable" data-sort="matches">
-                                    Матчи
-                                    <i class="fas fa-sort sort-icon"></i>
-                                </th>
-                                <th class="sortable" data-sort="wins">
-                                    Победы
-                                    <i class="fas fa-sort sort-icon"></i>
-                                </th>
-                
-                                <th class="sortable" data-sort="lastMatch">
-                                    Последний матч
-                                    <i class="fas fa-sort sort-icon"></i>
-                                </th>
-                                <th>Действия</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ranking-tbody">
-                            <!-- Данные будут загружены через JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Загрузка -->
-                <div id="loading-spinner" class="loading-spinner">
-                    <div class="spinner"></div>
-                    <p>Загрузка рейтинга...</p>
-                </div>
-
-                <!-- Пустое состояние -->
-                <div id="empty-state" class="empty-state" style="display: none;">
-                    <i class="fas fa-users-slash"></i>
-                    <h3>Нет данных</h3>
-                    <p>Добавьте игроков в настройках для отображения рейтинга</p>
-                    <button class="btn btn-primary" onclick="openSettings()">
-                        <i class="fas fa-cog"></i>
-                        Настройки
-                    </button>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Модальное окно настроек -->
-    <div id="settings-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Настройки игроков</h3>
-                <button id="modal-close" class="modal-close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="add-player-nickname">Добавить игрока:</label>
-                                <div class="input-group">
-                <input type="text" id="add-player-nickname" placeholder="FACEIT никнейм">
-                <div class="group-selector">
-                    <label for="add-player-group">Группа:</label>
-                    <select id="add-player-group" class="group-select">
-                        <option value="">Без группы</option>
-                        <option value="music">🎵 Музыка</option>
-                        <option value="black">⚫ Черные</option>
-                    </select>
-                </div>
-                <button id="add-player-btn" class="btn btn-primary">
-                    <i class="fas fa-plus"></i>
-                    Добавить
-                </button>
-            </div>
-                </div>
-
-                <div class="players-list">
-                    <h4>Текущие игроки:</h4>
-                    <div id="players-list-container">
-                        <!-- Список игроков будет загружен динамически -->
-                    </div>
-                </div>
-
-                <div class="nickname-hints">
-                    <p><strong>Попробуйте известных игроков:</strong></p>
-                    <div class="hint-tags">
-                        <span class="hint-tag" data-nickname="ZywOo">ZywOo</span>
-                        <span class="hint-tag" data-nickname="sh1ro">sh1ro</span>
-                        <span class="hint-tag" data-nickname="ropz">ropz</span>
-                        <span class="hint-tag" data-nickname="broky">broky</span>
-                        <span class="hint-tag" data-nickname="Twistzz">Twistzz</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="table-wrap" role="region" aria-label="FACEIT рейтинг игроков">
+      <table role="table" aria-label="Таблица FACEIT">
+        <thead>
+        <tr>
+          <th scope="col">Имя</th>
+          <th scope="col">Ник</th>
+          <th scope="col">LVL</th>
+          <th scope="col">ELO</th>
+          <th scope="col">Регион</th>
+          <th scope="col">Steam</th>
+        </tr>
+        </thead>
+        <tbody id="faceit-table-body">
+          <tr><td class="loading" colspan="6" aria-live="polite">Загрузка…</td></tr>
+        </tbody>
+      </table>
     </div>
 
-    <!-- Кнопка настроек -->
-    <button id="settings-btn" class="settings-btn">
-        <i class="fas fa-cog"></i>
-    </button>
+    <p class="note muted">Список игроков редактируется в таблице <code>public.players</code> (Supabase): <code>nickname</code>, <code>display_name</code>, <code>sort_order</code>.</p>
+  </div>
 
-    <!-- Скрипты -->
-    <script src="faceit-ranking-script.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  // ВСТАВЬ СВОИ ДАННЫЕ:
-  window.SUPABASE_URL = "https://wpsjgygdbkvdjkikvzws.supabase.co";
-  window.SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indwc2pneWdkYmt2ZGpraWt2endzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzNDMzMDQsImV4cCI6MjA3MTkxOTMwNH0.m1DFironTn3qT9aNNnCafYs81pTPQlsCVzw79Ss1QOg";
-</script>
-<script src="./faceit-ranking-script.js"></script>
+  <script>
+    // === ТВОИ КЛЮЧИ (уже подставлены) ===
+    const SUPABASE_URL = "https://wpsjgygdbkvdjkikvzws.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indwc2pneWdkYmt2ZGpraWt2endzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzNDMzMDQsImV4cCI6MjA3MTkxOTMwNH0.m1DFironTn3qT9aNNnCafYs81pTPQlsCVzw79Ss1QOg";
+    const FACEIT_API_KEY = "73782652-2cd5-405b-9c98-d28b2620bd0c";
+    // =====================================
 
+    const FACEIT_API = "https://open.faceit.com/data/v4";
+    const TABLE_BODY_ID = "faceit-table-body";
+
+    // маленький лимитер параллельных запросов
+    async function mapLimit(arr, limit, iter) {
+      const ret = [];
+      const executing = [];
+      for (const item of arr) {
+        const p = Promise.resolve().then(() => iter(item));
+        ret.push(p);
+        if (limit <= arr.length) {
+          const e = p.then(() => executing.splice(executing.indexOf(e), 1));
+          executing.push(e);
+          if (executing.length >= limit) await Promise.race(executing);
+        }
+      }
+      return Promise.all(ret);
+    }
+
+    // 1) Читаем ЕДИНЫЙ список игроков из БД
+    async function fetchPlayersList() {
+      const url = `${SUPABASE_URL}/rest/v1/players?select=nickname,display_name,sort_order&order=sort_order.asc`;
+      const res = await fetch(url, { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }});
+      if (!res.ok) throw new Error("Не удалось получить список игроков из БД");
+      return res.json();
+    }
+
+    // 2) По нику — данные из FACEIT
+    async function fetchFaceitByNickname(nickname) {
+      const res = await fetch(`${FACEIT_API}/players?nickname=${encodeURIComponent(nickname)}`, {
+        headers: { Authorization: `Bearer ${FACEIT_API_KEY}` }
+      });
+      if (!res.ok) return { error: true, nickname };
+      const info = await res.json();
+
+      // пробуем достать инфо по CS2; при необходимости замени на другую игру
+      const cs2 = info.games?.cs2 ?? {};
+      const level = cs2.skill_level ?? null;
+      const elo = cs2.faceit_elo ?? null;
+      const region = cs2.region ?? info.country ?? null;
+
+      return {
+        nickname: info.nickname || nickname,
+        player_id: info.player_id,
+        steam_nickname: info.steam_nickname ?? null,
+        faceit_url: info.faceit_url ?? null,
+        avatar: info.avatar ?? null,
+        level, elo, region
+      };
+    }
+
+    // 3) Рендер таблицы
+    function renderRows(items) {
+      const tbody = document.getElementById(TABLE_BODY_ID);
+      tbody.innerHTML = "";
+
+      if (!items.length) {
+        tbody.innerHTML = `<tr><td class="loading" colspan="6">Список пуст</td></tr>`;
+        return;
+      }
+
+      for (const row of items) {
+        const tr = document.createElement("tr");
+
+        const avatarImg = row.avatar ? `<img class="avatar" src="${row.avatar}" alt="Аватар ${row.display_name}">` : "";
+        const profileLinkOpen = row.faceit_url ? `<a href="${row.faceit_url}" target="_blank" rel="noopener">` : "";
+        const profileLinkClose = row.faceit_url ? `</a>` : "";
+
+        tr.innerHTML = `
+          <td>
+            <div class="player">
+              ${avatarImg}
+              ${profileLinkOpen}${row.display_name}${profileLinkClose}
+            </div>
+          </td>
+          <td>${row.nickname ?? "—"}</td>
+          <td>${row.level ?? "—"}</td>
+          <td>${row.elo ?? "—"}</td>
+          <td>${row.region ?? "—"}</td>
+          <td>${row.steam_nickname ?? "—"}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    // 4) Главная функция
+    async function loadFaceitTable() {
+      const tbody = document.getElementById(TABLE_BODY_ID);
+      tbody.innerHTML = `<tr><td class="loading" colspan="6" aria-live="polite">Загрузка…</td></tr>`;
+
+      try {
+        const list = await fetchPlayersList(); // [{nickname, display_name, sort_order}, ...]
+        // ограничим до 3 параллельных обращений к FACEIT
+        const details = await mapLimit(list, 3, async (p) => {
+          const info = await fetchFaceitByNickname(p.nickname);
+          return {
+            display_name: p.display_name,
+            nickname: info.nickname ?? p.nickname,
+            level: info.level ?? null,
+            elo: info.elo ?? null,
+            region: info.region ?? null,
+            steam_nickname: info.steam_nickname ?? null,
+            avatar: info.avatar ?? null,
+            faceit_url: info.faceit_url ?? null
+          };
+        });
+
+        renderRows(details);
+      } catch (err) {
+        tbody.innerHTML = `<tr><td class="loading" colspan="6">Ошибка: ${err.message}</td></tr>`;
+        console.error(err);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadFaceitTable);
+  </script>
 </body>
 </html>
