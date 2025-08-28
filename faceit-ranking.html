@@ -42,9 +42,25 @@
   <!-- Контент -->
   <section class="releases" style="padding-top: 8rem;">
     <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">FACEIT рейтинг (единый список)</h2>
-        <p class="section-subtitle">Список из БД, данные по нику из FACEIT API</p>
+      <div class="section-header" style="display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
+        <div>
+          <h2 class="section-title">FACEIT рейтинг (единый список)</h2>
+          <p class="section-subtitle">Список из БД, данные по нику из FACEIT API</p>
+        </div>
+        <div style="display:flex; gap:.75rem; align-items:center;">
+          <div>
+            <label for="group-filter" style="display:block; font-size:.85rem; color: var(--text-secondary); margin-bottom:.25rem;">Фильтр по группе</label>
+            <select id="group-filter" style="padding:.55rem .8rem; background: rgba(255,255,255,0.05); border:1px solid var(--border-color); color: var(--text-primary); border-radius:8px;">
+              <option value="ALL">Все</option>
+              <option value="Черные">Черные</option>
+              <option value="Музыка">Музыка</option>
+              <option value="Без группы">Без группы</option>
+            </select>
+          </div>
+          <button id="open-add-player" class="btn btn-secondary" title="Добавить игрока" aria-label="Добавить игрока">
+            <i class="fas fa-cog"></i>
+          </button>
+        </div>
       </div>
 
       <div class="table-card" role="region" aria-label="FACEIT рейтинг игроков">
@@ -54,8 +70,8 @@
               <tr>
                 <th scope="col">Имя</th>
                 <th scope="col">LVL</th>
-                <th scope="col">ELO</th>
-                <th scope="col">Матчей</th>
+                <th scope="col" id="sort-elo" style="cursor:pointer;">ELO</th>
+                <th scope="col" id="sort-matches" style="cursor:pointer;">Матчей</th>
                 <th scope="col">Действия</th>
               </tr>
             </thead>
@@ -111,6 +127,11 @@
 
     const FACEIT_API = "https://open.faceit.com/data/v4";
     const TABLE_BODY_ID = "faceit-table-body";
+    const GROUPS = ["Без группы", "Черные", "Музыка"];
+    let CURRENT_ITEMS = [];
+    let SORT_BY = null; // 'elo' | 'matches'
+    let SORT_DIR = 'desc';
+    let FILTER_GROUP = 'ALL';
 
     // маленький лимитер параллельных запросов
     async function mapLimit(arr, limit, iter) {
@@ -130,7 +151,7 @@
 
     // 1) Читаем ЕДИНЫЙ список игроков из БД
     async function fetchPlayersList() {
-      const url = `${SUPABASE_URL}/rest/v1/players?select=nickname,display_name,sort_order&order=sort_order.asc`;
+      const url = `${SUPABASE_URL}/rest/v1/players?select=nickname,display_name,sort_order,group_name&order=sort_order.asc`;
       const res = await fetch(url, { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }});
       if (!res.ok) throw new Error("Не удалось получить список игроков из БД");
       return res.json();
@@ -154,7 +175,7 @@
         nickname: info.nickname || nickname,
         player_id: info.player_id,
         steam_nickname: info.steam_nickname ?? null,
-        faceit_url: info.faceit_url ?? null,
+        faceit_url: `https://www.faceit.com/ru/players/${encodeURIComponent(info.nickname || nickname)}`,
         avatar: info.avatar ?? null,
         level, elo, region
       };
@@ -177,6 +198,19 @@
     }
 
     // 3) Рендер таблицы
+    function applyFilterSort(items) {
+      let out = Array.from(items);
+      if (FILTER_GROUP !== 'ALL') {
+        out = out.filter(x => (x.group_name || 'Без группы') === FILTER_GROUP);
+      }
+      if (SORT_BY === 'elo') {
+        out.sort((a,b) => (Number(b.elo||0) - Number(a.elo||0)) * (SORT_DIR==='desc'?1:-1));
+      } else if (SORT_BY === 'matches') {
+        out.sort((a,b) => (Number(b.matches_count||0) - Number(a.matches_count||0)) * (SORT_DIR==='desc'?1:-1));
+      }
+      return out;
+    }
+
     function renderRows(items) {
       const tbody = document.getElementById(TABLE_BODY_ID);
       tbody.innerHTML = "";
@@ -186,7 +220,7 @@
         return;
       }
 
-      for (const row of items) {
+      for (const row of applyFilterSort(items)) {
         const tr = document.createElement("tr");
 
         const avatarImg = row.avatar ? `<img class="avatar" src="${row.avatar}" alt="Аватар ${row.display_name}">` : "";
@@ -204,7 +238,9 @@
           <td>${row.level ?? "—"}</td>
           <td>${row.elo ?? "—"}</td>
           <td>${row.matches_count ?? "—"}</td>
-          <td><button class="btn btn-secondary" data-player='${safeData}'>Подробнее</button></td>
+          <td style="display:flex; gap:.5rem;">
+            <button class="btn btn-secondary" data-player='${safeData}'>Подробнее</button>
+          </td>
         `;
         tbody.appendChild(tr);
       }
@@ -239,11 +275,13 @@
             matches_count: info.player_id ? await fetchMatchesCount(info.player_id) : null,
             steam_nickname: info.steam_nickname ?? null,
             avatar: info.avatar ?? null,
-            faceit_url: info.faceit_url ?? null
+            faceit_url: info.faceit_url ?? null,
+            group_name: p.group_name || 'Без группы'
           };
         });
 
-        renderRows(details);
+        CURRENT_ITEMS = details;
+        renderRows(CURRENT_ITEMS);
       } catch (err) {
         tbody.innerHTML = `<tr><td class="loading" colspan="6">Ошибка: ${err.message}</td></tr>`;
         console.error(err);
@@ -285,6 +323,88 @@
       }
     });
 
+    // Сортировка
+    document.addEventListener('click', (e) => {
+      if (e.target && e.target.id === 'sort-elo') {
+        SORT_BY = 'elo';
+        SORT_DIR = SORT_DIR === 'desc' ? 'asc' : 'desc';
+        renderRows(CURRENT_ITEMS);
+      } else if (e.target && e.target.id === 'sort-matches') {
+        SORT_BY = 'matches';
+        SORT_DIR = SORT_DIR === 'desc' ? 'asc' : 'desc';
+        renderRows(CURRENT_ITEMS);
+      }
+    });
+
+    // Фильтр по группе
+    document.addEventListener('change', (e) => {
+      if (e.target && e.target.id === 'group-filter') {
+        FILTER_GROUP = e.target.value;
+        renderRows(CURRENT_ITEMS);
+      }
+    });
+
+    // Модалка добавления игрока
+    document.addEventListener('click', (e) => {
+      if (e.target && e.target.id === 'open-add-player') {
+        openAddPlayerModal();
+      }
+    });
+
+    async function insertPlayer({ display_name, nickname, group_name }) {
+      if (!display_name || !nickname) throw new Error('Введите имя и ник');
+      const body = [{ display_name, nickname, group_name, sort_order: Date.now() }];
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/players`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=representation'
+        },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) {
+        const t = await res.text().catch(()=>"");
+        throw new Error('Не удалось добавить игрока. ' + t);
+      }
+      return res.json();
+    }
+
+    function openAddPlayerModal() {
+      const overlay = document.getElementById('faceit-add-overlay');
+      const modal = document.getElementById('faceit-add-modal');
+      overlay.style.display = 'block';
+      modal.style.display = 'block';
+    }
+
+    function closeAddPlayerModal() {
+      const overlay = document.getElementById('faceit-add-overlay');
+      const modal = document.getElementById('faceit-add-modal');
+      overlay.style.display = 'none';
+      modal.style.display = 'none';
+    }
+
+    document.addEventListener('click', async (e) => {
+      if (e.target && (e.target.id === 'faceit-add-close' || e.target.id === 'faceit-add-overlay')) {
+        closeAddPlayerModal();
+      }
+      if (e.target && e.target.id === 'faceit-add-save') {
+        const dn = document.getElementById('add-display-name').value.trim();
+        const nn = document.getElementById('add-nickname').value.trim();
+        const gg = document.getElementById('add-group').value;
+        const err = document.getElementById('add-error');
+        err.textContent = '';
+        try {
+          await insertPlayer({ display_name: dn, nickname: nn, group_name: gg });
+          closeAddPlayerModal();
+          await loadFaceitTable();
+        } catch (ex) {
+          err.textContent = ex.message;
+        }
+      }
+    });
+
     document.addEventListener("DOMContentLoaded", loadFaceitTable);
   </script>
 
@@ -296,6 +416,37 @@
       <button id="faceit-modal-close" class="btn btn-secondary">Закрыть</button>
     </div>
     <div id="faceit-modal-body" style="padding:16px; color: var(--text-secondary);"></div>
+  </div>
+
+  <!-- Добавление игрока -->
+  <div id="faceit-add-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6);"></div>
+  <div id="faceit-add-modal" style="display:none; position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); background: var(--card-bg); border:1px solid var(--border-color); border-radius:16px; width:min(560px, calc(100% - 2rem)); box-shadow: var(--shadow-card); overflow:hidden;">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid var(--border-color);">
+      <h3 style="margin:0;">Добавить игрока</h3>
+      <button id="faceit-add-close" class="btn btn-secondary">Закрыть</button>
+    </div>
+    <div style="padding:16px; display:grid; gap:12px;">
+      <div>
+        <label for="add-display-name" style="display:block; font-size:.85rem; color: var(--text-secondary); margin-bottom:.25rem;">Имя</label>
+        <input id="add-display-name" type="text" placeholder="Например: makak1chh" style="width:100%; padding:.8rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-primary);">
+      </div>
+      <div>
+        <label for="add-nickname" style="display:block; font-size:.85rem; color: var(--text-secondary); margin-bottom:.25rem;">Ник</label>
+        <input id="add-nickname" type="text" placeholder="Ник на FACEIT" style="width:100%; padding:.8rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-primary);">
+      </div>
+      <div>
+        <label for="add-group" style="display:block; font-size:.85rem; color: var(--text-secondary); margin-bottom:.25rem;">Группа</label>
+        <select id="add-group" style="width:100%; padding:.8rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-primary);">
+          <option>Без группы</option>
+          <option>Черные</option>
+          <option>Музыка</option>
+        </select>
+      </div>
+      <p id="add-error" style="color:#f87171; margin:0;"></p>
+      <div style="display:flex; gap:.5rem; justify-content:flex-end;">
+        <button id="faceit-add-save" class="btn btn-primary">Сохранить</button>
+      </div>
+    </div>
   </div>
 </body>
 </html>
