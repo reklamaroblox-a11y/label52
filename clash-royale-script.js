@@ -1,5 +1,5 @@
-// Конфигурация API - используем серверный прокси
-const API_BASE_URL = '/api';
+// Конфигурация API - используем Netlify Functions
+const API_BASE_URL = '/.netlify/functions/api';
 
 // Элементы DOM
 const playerSearch = document.getElementById('playerSearch');
