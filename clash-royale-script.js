@@ -1,6 +1,6 @@
-// Конфигурация API - временно используем прямой вызов прокси-сервера
-// TODO: Вернуть на Netlify Functions после исправления проблем с развертыванием
-const API_BASE_URL = 'https://proxy.royaleapi.dev/v1';
+// Конфигурация API - используем локальный сервер
+const API_BASE_URL = 'http://localhost:3000/api';
+// const API_BASE_URL = 'https://proxy.royaleapi.dev/v1'; // Закомментировано - используем локальный сервер
 // const API_BASE_URL = '/.netlify/functions/api'; // Закомментировано до исправления Netlify Functions
 
 // ВРЕМЕННО: API ключ для прямого вызова (удалить после исправления Netlify Functions)
@@ -129,22 +129,17 @@ async function fetchPlayerData(playerTag) {
     const url = `${API_BASE_URL}/players/${encodeURIComponent(playerTag)}`;
     
     try {
-        const headers = {
-            'Content-Type': 'application/json'
-        };
-        
-        // Добавляем API ключ для прямого вызова прокси
-        if (TEMP_API_KEY && TEMP_API_KEY !== 'YOUR_API_KEY_HERE') {
-            headers['Authorization'] = `Bearer ${TEMP_API_KEY}`;
-        }
-        
-        const response = await fetch(url, { headers });
+        const response = await fetch(url, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
         
         const data = await response.json();
         
         // Проверяем, есть ли ошибка в ответе от API
-        if (data.reason) {
-            throw new Error(data.message || data.reason || 'Произошла ошибка при получении данных');
+        if (data.error) {
+            throw new Error(data.message || 'Произошла ошибка при получении данных');
         }
         
         // Проверяем HTTP статус
@@ -158,7 +153,7 @@ async function fetchPlayerData(playerTag) {
             } else if (response.status === 503) {
                 throw new Error('Сервис временно недоступен. Попробуйте позже.');
             } else {
-                throw new Error(`Ошибка API: ${response.status} - ${data.message || data.reason || 'Неизвестная ошибка'}`);
+                throw new Error(`Ошибка API: ${response.status} - ${data.message || 'Неизвестная ошибка'}`);
             }
         }
         

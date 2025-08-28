@@ -7,8 +7,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Конфигурация API
-const CLASH_ROYALE_API_TOKEN = process.env.CLASH_ROYALE_API_TOKEN || 'YOUR_API_TOKEN_HERE';
-const API_BASE_URL = 'https://api.clashroyale.com/v1';
+const CLASH_ROYALE_API_TOKEN = process.env.CLASH_ROYALE_API_TOKEN || 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6ImRhZWE3Y2MwLTEyMmItNDcxOS1iMjMzLTU5NzJmMzY0MDE0YiIsImlhdCI6MTc1NjQxNTY2MSwic3ViIjoiZGV2ZWxvcGVyL2QxNmI1OTMxLTc4NTctNTQ5Yy1hMjlmLTAzOTEwNDI3NDc2NSIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyI0NS43OS4yMTguNzkiXSwidHlwZSI6ImNsaWVudCJ9XX0.7m8yvoWZazJuUysMiy0d_eLfVkfZ-2MQmUH6yVdnmaAxJzLnVhxQCDIvikaPLxi6rkidVy_68jvefdwOkZP6zQ';
+const API_BASE_URL = 'https://proxy.royaleapi.dev/v1';
 
 // Middleware
 app.use(cors());
