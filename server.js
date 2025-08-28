@@ -14,13 +14,38 @@ const API_BASE_URL = 'https://api.clashroyale.com/v1';
 app.use(cors());
 app.use(express.json());
 
-// Статические файлы
-app.use(express.static(path.join(__dirname)));
+// Статические файлы с правильными заголовками
+app.use(express.static(path.join(__dirname), {
+    setHeaders: (res, path) => {
+        if (path.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css');
+            res.setHeader('Cache-Control', 'public, max-age=31536000');
+        } else if (path.endsWith('.js')) {
+            res.setHeader('Content-Type', 'application/javascript');
+            res.setHeader('Cache-Control', 'public, max-age=31536000');
+        }
+    }
+}));
 
 // Логирование запросов
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.path}`);
     next();
+});
+
+// Специальные маршруты для статических файлов
+app.get('*.css', (req, res) => {
+    const filePath = path.join(__dirname, req.path);
+    res.setHeader('Content-Type', 'text/css');
+    res.setHeader('Cache-Control', 'public, max-age=31536000');
+    res.sendFile(filePath);
+});
+
+app.get('*.js', (req, res) => {
+    const filePath = path.join(__dirname, req.path);
+    res.setHeader('Content-Type', 'application/javascript');
+    res.setHeader('Cache-Control', 'public, max-age=31536000');
+    res.sendFile(filePath);
 });
 
 // API прокси для Clash Royale
