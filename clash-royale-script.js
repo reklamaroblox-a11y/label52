@@ -1,5 +1,11 @@
-// Конфигурация API - используем Netlify Functions
-const API_BASE_URL = '/.netlify/functions/api';
+// Конфигурация API - временно используем прямой вызов прокси-сервера
+// TODO: Вернуть на Netlify Functions после исправления проблем с развертыванием
+const API_BASE_URL = 'https://proxy.royaleapi.dev/v1';
+// const API_BASE_URL = '/.netlify/functions/api'; // Закомментировано до исправления Netlify Functions
+
+// ВРЕМЕННО: API ключ для прямого вызова (удалить после исправления Netlify Functions)
+// Получите ключ на https://developer.clashroyale.com/ и добавьте IP 45.79.218.79 в whitelist
+const TEMP_API_KEY = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6ImRhZWE3Y2MwLTEyMmItNDcxOS1iMjMzLTU5NzJmMzY0MDE0YiIsImlhdCI6MTc1NjQxNTY2MSwic3ViIjoiZGV2ZWxvcGVyL2QxNmI1OTMxLTc4NTctNTQ5Yy1hMjlmLTAzOTEwNDI3NDc2NSIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyI0NS43OS4yMTguNzkiXSwidHlwZSI6ImNsaWVudCJ9XX0.7m8yvoWZazJuUysMiy0d_eLfVkfZ-2MQmUH6yVdnmaAxJzLnVhxQCDIvikaPLxi6rkidVy_68jvefdwOkZP6zQ';
 
 // Элементы DOM
 const playerSearch = document.getElementById('playerSearch');
@@ -56,16 +62,24 @@ document.addEventListener('DOMContentLoaded', function() {
 // Функция тестирования API
 async function testAPI() {
     try {
-        const response = await fetch(`${API_BASE_URL}/cards`, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        
+        // Добавляем API ключ для тестирования
+        if (TEMP_API_KEY && TEMP_API_KEY !== 'YOUR_API_KEY_HERE') {
+            headers['Authorization'] = `Bearer ${TEMP_API_KEY}`;
+        }
+        
+        const response = await fetch(`${API_BASE_URL}/cards`, { headers });
         
         if (response.ok) {
             console.log('✅ API работает корректно');
+            console.log('🔗 Используется прокси-сервер:', API_BASE_URL);
         } else {
             console.warn('⚠️ API вернул статус:', response.status);
+            const errorData = await response.json().catch(() => ({}));
+            console.warn('📝 Детали ошибки:', errorData);
         }
     } catch (error) {
         console.error('❌ Ошибка при тестировании API:', error);
