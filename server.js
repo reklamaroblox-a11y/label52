@@ -13,7 +13,15 @@ const API_BASE_URL = 'https://api.clashroyale.com/v1';
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Статические файлы
 app.use(express.static(path.join(__dirname)));
+
+// Логирование запросов
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path}`);
+    next();
+});
 
 // API прокси для Clash Royale
 app.get('/api/players/:playerTag', async (req, res) => {
