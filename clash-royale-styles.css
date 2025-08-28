@@ -12,6 +12,7 @@
     --cr-gold: #ffd700;
     --cr-orange: #ff6b35;
     --cr-red: #ff4757;
+    --cr-green: #4ade80;
     --dark-bg: #0f0f23;
     --darker-bg: #0a0a1a;
     --card-bg: rgba(255, 255, 255, 0.05);
@@ -482,60 +483,204 @@ body {
     font-weight: 600;
 }
 
-/* Статистика */
+/* Расширенная статистика */
 .stats-section h3 {
     font-size: 1.8rem;
     margin-bottom: 1.5rem;
     color: var(--text-primary);
 }
 
-.stats-grid {
+.stats-grid-extended {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
 }
 
-.stat-card {
+.stats-category {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
     transition: all 0.3s ease;
     animation: fadeInUp 0.6s ease;
 }
 
-.stat-card:hover {
+.stats-category:hover {
     transform: translateY(-3px);
     border-color: var(--cr-gold);
     box-shadow: 0 10px 30px rgba(255, 215, 0, 0.1);
 }
 
-.stat-icon {
-    width: 50px;
-    height: 50px;
+.category-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.category-header i {
+    width: 40px;
+    height: 40px;
     background: var(--gradient-cr);
-    border-radius: 12px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     color: var(--dark-bg);
-    flex-shrink: 0;
 }
 
-.stat-content h4 {
-    font-size: 1rem;
+.category-header h4 {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    margin: 0;
+}
+
+.category-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+
+.stat-label {
+    font-size: 0.9rem;
     color: var(--text-secondary);
-    margin-bottom: 0.25rem;
+    font-weight: 500;
 }
 
-.stat-content p {
-    font-size: 1.5rem;
-    font-weight: 700;
+.stat-value {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.rank {
+    color: var(--text-secondary);
+}
+
+.league {
     color: var(--cr-gold);
+    font-weight: 700;
+}
+
+.trophies {
+    color: var(--cr-gold);
+    font-weight: 700;
+}
+
+.clan-cards {
+    color: var(--cr-gold);
+    font-weight: 700;
+}
+
+.war-wins {
+    color: var(--cr-gold);
+    font-weight: 700;
+}
+
+.wins {
+    color: var(--cr-green);
+    font-weight: 700;
+}
+
+.losses {
+    color: var(--cr-red);
+    font-weight: 700;
+}
+
+.percentage {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.total-games {
+    color: var(--cr-gold);
+    font-weight: 700;
+}
+
+.three-crowns {
+    color: var(--cr-gold);
+    font-weight: 700;
+}
+
+.max-wins {
+    color: var(--cr-gold);
+    font-weight: 700;
+}
+
+.cards-won {
+    color: var(--cr-gold);
+    font-weight: 700;
+}
+
+.classic-12, .grand-12 {
+    color: var(--cr-gold);
+    font-weight: 700;
+}
+
+.tournament-games {
+    color: var(--cr-gold);
+    font-weight: 700;
+}
+
+.exp-level {
+    color: var(--cr-gold);
+    font-weight: 700;
+}
+
+.cards-found {
+    color: var(--cr-gold);
+    font-weight: 700;
+}
+
+.donations {
+    color: var(--cr-gold);
+    font-weight: 700;
+}
+
+.star-points {
+    color: var(--cr-gold);
+    font-weight: 700;
+}
+
+.account-age {
+    color: var(--cr-gold);
+    font-weight: 700;
+}
+
+.games-per-day {
+    color: var(--cr-gold);
+    font-weight: 700;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+    .stats-grid-extended {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .stat-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    
+    .stat-value {
+        justify-content: flex-start;
+    }
 }
 
 /* Сообщение об ошибке */

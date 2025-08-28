@@ -110,44 +110,179 @@
                 </div>
             </div>
 
-            <!-- Дополнительная статистика -->
+            <!-- Расширенная статистика -->
             <div class="stats-section" id="statsSection" style="display: none;">
-                <h3>Дополнительная статистика</h3>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-trophy"></i>
+                <h3>Расширенная статистика</h3>
+                <div class="stats-grid-extended">
+                    <!-- Ranked Stats -->
+                    <div class="stats-category">
+                        <div class="category-header">
+                            <i class="fas fa-shield-alt"></i>
+                            <h4>Ranked Stats</h4>
                         </div>
-                        <div class="stat-content">
-                            <h4>Победы</h4>
-                            <p id="totalWins">-</p>
+                        <div class="category-content">
+                            <div class="stat-row">
+                                <span class="stat-label">BEST SEASON:</span>
+                                <span class="stat-value">
+                                    <span class="rank">Unranked</span>
+                                    <span class="league">League 7</span>
+                                </span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">CURRENT SEASON:</span>
+                                <span class="stat-value">
+                                    <span class="rank">Unranked</span>
+                                    <span class="league">League 1</span>
+                                </span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">LAST SEASON:</span>
+                                <span class="stat-value">
+                                    <span class="rank">Unranked</span>
+                                    <span class="league">League 3</span>
+                                </span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">BEST LEGACY LADDER:</span>
+                                <span class="stat-value">
+                                    <span class="rank">Unranked</span>
+                                    <span class="trophies">5,364</span>
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-gamepad"></i>
+
+                    <!-- Battle Stats -->
+                    <div class="stats-category">
+                        <div class="category-header">
+                            <i class="fas fa-sword"></i>
+                            <h4>Battle Stats</h4>
                         </div>
-                        <div class="stat-content">
-                            <h4>Всего игр</h4>
-                            <p id="totalGames">-</p>
+                        <div class="category-content">
+                            <div class="stat-row">
+                                <span class="stat-label">Clan Wars:</span>
+                                <span class="stat-value">
+                                    <span class="clan-cards">4,340</span>
+                                </span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">War Day Wins:</span>
+                                <span class="stat-value">
+                                    <span class="war-wins">4</span>
+                                </span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Wins:</span>
+                                <span class="stat-value">
+                                    <span class="wins">1,652</span>
+                                    <span class="percentage">66.159%</span>
+                                </span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Losses:</span>
+                                <span class="stat-value">
+                                    <span class="losses">845</span>
+                                    <span class="percentage">33.841%</span>
+                                </span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Total Games:</span>
+                                <span class="stat-value">
+                                    <span class="total-games">2,497</span>
+                                </span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Three Crown Wins:</span>
+                                <span class="stat-value">
+                                    <span class="three-crowns">974</span>
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-percentage"></i>
+
+                    <!-- Challenge Stats -->
+                    <div class="stats-category">
+                        <div class="category-header">
+                            <i class="fas fa-medal"></i>
+                            <h4>Challenge Stats</h4>
                         </div>
-                        <div class="stat-content">
-                            <h4>Винрейт</h4>
-                            <p id="winRate">-</p>
+                        <div class="category-content">
+                            <div class="stat-row">
+                                <span class="stat-label">Max Wins:</span>
+                                <span class="stat-value">
+                                    <span class="max-wins">9</span>
+                                </span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Cards Won:</span>
+                                <span class="stat-value">
+                                    <span class="cards-won">2,195</span>
+                                </span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Classic Challenge 12-wins:</span>
+                                <span class="stat-value">
+                                    <span class="classic-12">0</span>
+                                </span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Grand Challenge 12-wins:</span>
+                                <span class="stat-value">
+                                    <span class="grand-12">0</span>
+                                </span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Tournaments:</span>
+                                <span class="stat-value">
+                                    <span class="tournament-games">130</span>
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
+
+                    <!-- Misc Stats -->
+                    <div class="stats-category">
+                        <div class="category-header">
                             <i class="fas fa-star"></i>
+                            <h4>Misc Stats</h4>
                         </div>
-                        <div class="stat-content">
-                            <h4>Макс. уровень</h4>
-                            <p id="maxLevel">-</p>
+                        <div class="category-content">
+                            <div class="stat-row">
+                                <span class="stat-label">Experience:</span>
+                                <span class="stat-value">
+                                    <span class="exp-level">Level 48</span>
+                                </span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Cards Found:</span>
+                                <span class="stat-value">
+                                    <span class="cards-found">119 / 120</span>
+                                </span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Total Donations:</span>
+                                <span class="stat-value">
+                                    <span class="donations">20,186</span>
+                                </span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Star Points:</span>
+                                <span class="stat-value">
+                                    <span class="star-points">101,266</span>
+                                </span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Account Age:</span>
+                                <span class="stat-value">
+                                    <span class="account-age">7y 43w 3d</span>
+                                </span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Games per Day:</span>
+                                <span class="stat-value">
+                                    <span class="games-per-day">0.87</span>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
