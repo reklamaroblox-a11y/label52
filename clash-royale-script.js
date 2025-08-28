@@ -48,7 +48,29 @@ document.addEventListener('DOMContentLoaded', function() {
         hamburger.classList.toggle('active');
         navMenu.classList.toggle('active');
     });
+    
+    // Тестируем API при загрузке страницы
+    testAPI();
 });
+
+// Функция тестирования API
+async function testAPI() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/cards`, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            console.log('✅ API работает корректно');
+        } else {
+            console.warn('⚠️ API вернул статус:', response.status);
+        }
+    } catch (error) {
+        console.error('❌ Ошибка при тестировании API:', error);
+    }
+}
 
 // Функция поиска игрока
 async function searchPlayer() {
@@ -92,23 +114,50 @@ async function searchPlayer() {
 async function fetchPlayerData(playerTag) {
     const url = `${API_BASE_URL}/players/${encodeURIComponent(playerTag)}`;
     
-    const response = await fetch(url, {
-        headers: {
-            'Content-Type': 'application/json'
+    try {
+        const response = await fetch(url, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        // Проверяем, есть ли ошибка в ответе от нашего API
+        if (data.error) {
+            throw new Error(data.message || 'Произошла ошибка при получении данных');
         }
-    });
-    
-    if (!response.ok) {
-        if (response.status === 404) {
-            throw new Error('Игрок не найден. Проверьте правильность тега.');
-        } else if (response.status === 403) {
-            throw new Error('Ошибка доступа к API. Попробуйте позже.');
-        } else {
-            throw new Error(`Ошибка API: ${response.status}`);
+        
+        // Проверяем HTTP статус
+        if (!response.ok) {
+            if (response.status === 404) {
+                throw new Error('Игрок не найден. Проверьте правильность тега.');
+            } else if (response.status === 403) {
+                throw new Error('Ошибка доступа к API. Проверьте API ключ и попробуйте позже.');
+            } else if (response.status === 429) {
+                throw new Error('Превышен лимит запросов к API. Попробуйте позже.');
+            } else if (response.status === 503) {
+                throw new Error('Сервис временно недоступен. Попробуйте позже.');
+            } else {
+                throw new Error(`Ошибка API: ${response.status} - ${data.message || 'Неизвестная ошибка'}`);
+            }
         }
+        
+        return data;
+        
+    } catch (error) {
+        // Если это наша ошибка, просто пробрасываем её
+        if (error.message.includes('Игрок не найден') || 
+            error.message.includes('Ошибка доступа') ||
+            error.message.includes('Превышен лимит') ||
+            error.message.includes('Сервис временно недоступен')) {
+            throw error;
+        }
+        
+        // Для других ошибок добавляем контекст
+        console.error('Ошибка при запросе к API:', error);
+        throw new Error(`Ошибка сети: ${error.message}`);
     }
-    
-    return await response.json();
 }
 
 // Функция получения колоды игрока

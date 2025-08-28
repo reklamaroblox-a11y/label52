@@ -32,6 +32,7 @@ exports.handler = async (event, context) => {
         const url = `${API_BASE_URL}${path}`;
         
         console.log(`Запрос к прокси API: ${url}`);
+        console.log(`Используемый токен: ${CLASH_ROYALE_API_TOKEN ? 'Присутствует' : 'Отсутствует'}`);
         
         const response = await axios.get(url, {
             headers: {
@@ -39,6 +40,8 @@ exports.handler = async (event, context) => {
                 'Content-Type': 'application/json'
             }
         });
+        
+        console.log(`Успешный ответ от API: ${response.status}`);
         
         return {
             statusCode: 200,
@@ -51,6 +54,7 @@ exports.handler = async (event, context) => {
         
     } catch (error) {
         console.error('Ошибка API:', error.response?.status, error.response?.data);
+        console.error('Полная ошибка:', error.message);
         
         let statusCode = 500;
         let message = 'Внутренняя ошибка сервера';
@@ -64,6 +68,9 @@ exports.handler = async (event, context) => {
         } else if (error.response?.status === 429) {
             statusCode = 429;
             message = 'Превышен лимит запросов к API. Попробуйте позже.';
+        } else if (error.code === 'ENOTFOUND') {
+            statusCode = 503;
+            message = 'Сервис временно недоступен. Попробуйте позже.';
         }
         
         return {
@@ -74,7 +81,8 @@ exports.handler = async (event, context) => {
             },
             body: JSON.stringify({
                 error: true,
-                message
+                message,
+                details: error.message
             })
         };
     }
