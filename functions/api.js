@@ -5,6 +5,11 @@ const CLASH_ROYALE_API_TOKEN = process.env.CLASH_ROYALE_API_TOKEN;
 const API_BASE_URL = 'https://api.clashroyale.com/v1';
 
 exports.handler = async (event, context) => {
+    // Логирование для диагностики
+    console.log('🔍 API Function вызвана');
+    console.log('📝 Token present:', !!process.env.CLASH_ROYALE_API_TOKEN);
+    console.log('🌐 Request path:', event.path);
+    
     // CORS заголовки
     const headers = {
         'Access-Control-Allow-Origin': '*',
