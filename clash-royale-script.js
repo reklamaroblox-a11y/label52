@@ -115,17 +115,22 @@ async function fetchPlayerData(playerTag) {
     const url = `${API_BASE_URL}/players/${encodeURIComponent(playerTag)}`;
     
     try {
-        const response = await fetch(url, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        
+        // Добавляем API ключ для прямого вызова прокси
+        if (TEMP_API_KEY && TEMP_API_KEY !== 'YOUR_API_KEY_HERE') {
+            headers['Authorization'] = `Bearer ${TEMP_API_KEY}`;
+        }
+        
+        const response = await fetch(url, { headers });
         
         const data = await response.json();
         
-        // Проверяем, есть ли ошибка в ответе от нашего API
-        if (data.error) {
-            throw new Error(data.message || 'Произошла ошибка при получении данных');
+        // Проверяем, есть ли ошибка в ответе от API
+        if (data.reason) {
+            throw new Error(data.message || data.reason || 'Произошла ошибка при получении данных');
         }
         
         // Проверяем HTTP статус
@@ -139,7 +144,7 @@ async function fetchPlayerData(playerTag) {
             } else if (response.status === 503) {
                 throw new Error('Сервис временно недоступен. Попробуйте позже.');
             } else {
-                throw new Error(`Ошибка API: ${response.status} - ${data.message || 'Неизвестная ошибка'}`);
+                throw new Error(`Ошибка API: ${response.status} - ${data.message || data.reason || 'Неизвестная ошибка'}`);
             }
         }
         
