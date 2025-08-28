@@ -1,56 +1,108 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <title>FACEIT рейтинг — LABEL 52</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Единый список игроков и их FACEIT рейтинг" />
+  <title>FACEIT рейтинг — LABEL 52</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
-    :root { color-scheme: dark; }
-    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif; background: #0b0b10; color: #eaeaf0; }
-    .wrap { max-width: 1100px; margin: 40px auto; padding: 0 16px; }
-    h1 { font-size: 28px; margin: 0 0 16px; }
-    p.note { opacity: .75; margin: 0 0 24px; font-size: 14px; }
-    .table-wrap { overflow-x: auto; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; background: rgba(255,255,255,.03); }
-    table { width: 100%; border-collapse: collapse; min-width: 720px; }
-    thead th { text-align: left; font-weight: 600; font-size: 14px; letter-spacing: .02em; padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,.06); }
-    tbody td { padding: 12px 14px; border-bottom: 1px dotted rgba(255,255,255,.06); vertical-align: middle; }
-    tbody tr:last-child td { border-bottom: none; }
+    .table-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; backdrop-filter: blur(20px); }
+    .table-card table { width: 100%; border-collapse: collapse; min-width: 720px; }
+    .table-card thead th { text-align: left; font-weight: 600; font-size: 0.9rem; letter-spacing: .02em; padding: 12px 16px; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
+    .table-card tbody td { padding: 12px 16px; border-bottom: 1px dotted var(--border-color); vertical-align: middle; color: var(--text-secondary); }
+    .table-card tbody tr:last-child td { border-bottom: none; }
     .player { display: flex; align-items: center; gap: 10px; }
-    .avatar { width: 28px; height: 28px; border-radius: 16px; object-fit: cover; border: 1px solid rgba(255,255,255,.12); }
-    a { color: #a5c9ff; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .muted { opacity: .7; }
+    .avatar { width: 28px; height: 28px; border-radius: 16px; object-fit: cover; border: 1px solid var(--border-color); }
     .loading { padding: 14px; text-align: center; }
-    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>FACEIT рейтинг (единый список)</h1>
-    <p class="note">Список игроков берётся из БД, а данные подтягиваются по нику из FACEIT API. Видят одинаковое <strong>все</strong>.</p>
-
-    <div class="table-wrap" role="region" aria-label="FACEIT рейтинг игроков">
-      <table role="table" aria-label="Таблица FACEIT">
-        <thead>
-        <tr>
-          <th scope="col">Имя</th>
-          <th scope="col">Ник</th>
-          <th scope="col">LVL</th>
-          <th scope="col">ELO</th>
-          <th scope="col">Регион</th>
-          <th scope="col">Steam</th>
-        </tr>
-        </thead>
-        <tbody id="faceit-table-body">
-          <tr><td class="loading" colspan="6" aria-live="polite">Загрузка…</td></tr>
-        </tbody>
-      </table>
+  <!-- Навигация -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <h2><a href="index.html" style="color: inherit; text-decoration: none;">LABEL 52</a></h2>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="index.html#home" class="nav-link">Главная</a></li>
+        <li><a href="faceit-ranking.html" class="nav-link">FACEIT Рейтинг</a></li>
+        <li><a href="spotify-stats.html" class="nav-link">Spotify Статистика</a></li>
+      </ul>
+      <div class="hamburger">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
     </div>
+  </nav>
 
-    <p class="note muted">Список игроков редактируется в таблице <code>public.players</code> (Supabase): <code>nickname</code>, <code>display_name</code>, <code>sort_order</code>.</p>
-  </div>
+  <!-- Контент -->
+  <section class="releases" style="padding-top: 8rem;">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">FACEIT рейтинг (единый список)</h2>
+        <p class="section-subtitle">Список из БД, данные по нику из FACEIT API</p>
+      </div>
 
+      <div class="table-card" role="region" aria-label="FACEIT рейтинг игроков">
+        <div style="overflow-x:auto;">
+          <table role="table" aria-label="Таблица FACEIT">
+            <thead>
+              <tr>
+                <th scope="col">Имя</th>
+                <th scope="col">Ник</th>
+                <th scope="col">LVL</th>
+                <th scope="col">ELO</th>
+                <th scope="col">Регион</th>
+                <th scope="col">Steam</th>
+              </tr>
+            </thead>
+            <tbody id="faceit-table-body">
+              <tr><td class="loading" colspan="6" aria-live="polite">Загрузка…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <p class="section-subtitle" style="margin-top: 1rem;">Редактирование: таблица <code>public.players</code> (Supabase) — поля <code>nickname</code>, <code>display_name</code>, <code>sort_order</code>.</p>
+    </div>
+  </section>
+
+  <!-- Футер -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <h3><a href="index.html" style="color: inherit; text-decoration: none;">LABEL 52</a></h3>
+          <p>Музыка будущего</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-section">
+            <h4>Лейбл</h4>
+            <ul>
+              <li><a href="index.html#artists">Артисты</a></li>
+              <li><a href="index.html#releases">Релизы</a></li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4>Поддержка</h4>
+            <ul>
+              <li><a href="#">FAQ</a></li>
+              <li><a href="#">Прайваси</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 LABEL 52. Все права защищены.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
   <script>
     // === ТВОИ КЛЮЧИ (уже подставлены) ===
     const SUPABASE_URL = "https://wpsjgygdbkvdjkikvzws.supabase.co";
