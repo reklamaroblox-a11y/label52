@@ -7,7 +7,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Конфигурация API
-const CLASH_ROYALE_API_TOKEN = 'YOUR_API_TOKEN_HERE';
+const CLASH_ROYALE_API_TOKEN = process.env.CLASH_ROYALE_API_TOKEN || 'YOUR_API_TOKEN_HERE';
 const API_BASE_URL = 'https://api.clashroyale.com/v1';
 
 // Middleware
