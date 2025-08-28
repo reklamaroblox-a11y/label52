@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clash Royale Статистика - LABEL 52</title>
+    <link rel="stylesheet" href="clash-royale-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2><a href="index.html" style="color: inherit; text-decoration: none;">LABEL 52</a></h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Главная</a></li>
+                <li><a href="faceit-ranking.html" class="nav-link">FACEIT Рейтинг</a></li>
+                <li><a href="spotify-stats.html" class="nav-link">Spotify Статистика</a></li>
+                <li><a href="clash-royale.html" class="nav-link active">Clash Royale</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Главная секция -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <span class="gradient-text">Clash Royale</span>
+                    <br>Статистика игроков
+                </h1>
+                <p class="hero-description">
+                    Найдите любого игрока Clash Royale и посмотрите его статистику, 
+                    топ кубков и текущую колоду.
+                </p>
+                
+                <!-- Поиск игрока -->
+                <div class="search-container">
+                    <div class="search-box">
+                        <input type="text" id="playerSearch" placeholder="Введите тег игрока (например: #ABC123)" class="search-input">
+                        <button id="searchBtn" class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <p class="search-hint">Тег игрока начинается с # и содержит буквы и цифры</p>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="cr-visualizer">
+                    <div class="crown"></div>
+                    <div class="cards">
+                        <div class="card"></div>
+                        <div class="card"></div>
+                        <div class="card"></div>
+                        <div class="card"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Результаты поиска -->
+    <section id="results" class="results-section" style="display: none;">
+        <div class="container">
+            <div class="loading-spinner" id="loadingSpinner" style="display: none;">
+                <div class="spinner"></div>
+                <p>Загружаем данные игрока...</p>
+            </div>
+            
+            <div class="player-profile" id="playerProfile" style="display: none;">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <img id="playerAvatar" src="" alt="Аватар игрока">
+                        <div class="level-badge" id="playerLevel"></div>
+                    </div>
+                    <div class="profile-info">
+                        <h2 id="playerName"></h2>
+                        <p id="playerTag"></p>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Топ кубков</span>
+                                <span class="stat-value" id="topTrophies"></span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Текущие кубки</span>
+                                <span class="stat-value" id="currentTrophies"></span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Арена</span>
+                                <span class="stat-value" id="playerArena"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Текущая колода -->
+            <div class="deck-section" id="deckSection" style="display: none;">
+                <h3>Текущая колода</h3>
+                <div class="deck-grid" id="deckGrid">
+                    <!-- Карты будут добавлены динамически -->
+                </div>
+            </div>
+
+            <!-- Дополнительная статистика -->
+            <div class="stats-section" id="statsSection" style="display: none;">
+                <h3>Дополнительная статистика</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Победы</h4>
+                            <p id="totalWins">-</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Всего игр</h4>
+                            <p id="totalGames">-</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Винрейт</h4>
+                            <p id="winRate">-</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Макс. уровень</h4>
+                            <p id="maxLevel">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Сообщение об ошибке -->
+    <div class="error-message" id="errorMessage" style="display: none;">
+        <div class="error-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p id="errorText"></p>
+        </div>
+    </div>
+
+    <!-- Футер -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h3><a href="index.html" style="color: inherit; text-decoration: none;">LABEL 52</a></h3>
+                    <p>Музыка будущего</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h4>Лейбл</h4>
+                        <ul>
+                            <li><a href="index.html#artists">Артисты</a></li>
+                            <li><a href="index.html#releases">Релизы</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Статистика</h4>
+                        <ul>
+                            <li><a href="faceit-ranking.html">FACEIT</a></li>
+                            <li><a href="spotify-stats.html">Spotify</a></li>
+                            <li><a href="clash-royale.html">Clash Royale</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 LABEL 52. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="clash-royale-script.js"></script>
+</body>
+</html>

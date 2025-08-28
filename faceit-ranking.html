@@ -276,11 +276,13 @@
         let kd = toNum(life["K/D Ratio"] ?? life["K/D"] ?? life["Average K/D Ratio"] ?? life["K/D ratio"]);
         let kr = toNum(life["K/R Ratio"] ?? life["K/R"] ?? life["Average K/R Ratio"] ?? life["K/R ratio"]);
         const hsPct = toNum(life["Average Headshots %"] ?? life["Headshots %"] ?? life["HS %"]);
+        // Average damage per round (ADR) or similar
+        const adr = toNum(life["Average Damage/Round"] ?? life["Average Damage"] ?? life["ADR"] ?? life["Avg Damage/Round"]);
         // sanity: if accidentally percent-like values slipped in
         if (kd != null && kd > 10) kd = Number((kd/100).toFixed(2));
         if (kr != null && kr > 5) kr = Number((kr/100).toFixed(2));
         const longestWinstreak = life["Longest Win Streak"] || life["Longest Win Streaks"] || life["Win Streak"] || null;
-        return { matches, winrate, kd, kr, hsPct, longestWinstreak };
+        return { matches, winrate, kd, kr, hsPct, adr, longestWinstreak };
       } catch (_) {
         return null;
       }
@@ -437,6 +439,7 @@
             kd: stats ? stats.kd : null,
             kr: stats ? stats.kr : null,
             hs_pct: stats ? stats.hsPct : null,
+            adr: stats ? stats.adr : null,
             longest_winstreak: stats ? stats.longestWinstreak : null,
             steam_nickname: info.steam_nickname ?? null,
             avatar: info.avatar ?? null,
@@ -513,6 +516,21 @@
               <div class="stat-sub">Средний процент HS</div>
             </div>
             <div class="stat-card">
+              <div class="stat-title">K/D</div>
+              <div class="stat-value">${player.kd ?? '—'}</div>
+              <div class="stat-sub">Убийств/Смертей</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-title">K/R</div>
+              <div class="stat-value">${player.kr ?? '—'}</div>
+              <div class="stat-sub">Kills / Round</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-title">ADR</div>
+              <div class="stat-value">${player.adr ?? '—'}</div>
+              <div class="stat-sub">Avg Damage/Round</div>
+            </div>
+            <div class="stat-card">
               <div class="stat-title">Longest Win Streak</div>
               <div class="stat-value">${player.longest_winstreak ?? '—'}</div>
               <div class="stat-sub">Подряд</div>
@@ -553,6 +571,8 @@
               <span class="muted">${r.date}</span>
               <span style="padding:2px 8px; border:1px solid var(--border-color); border-radius:999px;">${r.map || '—'}</span>
               ${r.score ? `<span class=\"chip chip-matches\">${r.score}</span>` : ''}
+              ${r.kd ? `<span class=\"chip\">K/D ${r.kd}</span>` : ''}
+              ${r.kr ? `<span class=\"chip\">K/R ${r.kr}</span>` : ''}
             </div>
             <div style="justify-self:end; display:flex; align-items:center; gap:8px;">
               ${r.url ? `<a class=\"link-plain\" href=\"${r.url}\" target=\"_blank\" rel=\"noopener\">детали</a>` : ''}
@@ -638,8 +658,9 @@
               }
             }
 
-            // K/D: search in rounds[0].players or teams players stats
+            // K/D, K/R: search in rounds[0].players or teams players stats
             let kd = '';
+            let kr = '';
             let playersArr = (round0.players || []);
             if (!playersArr.length && round0.teams) {
               playersArr = [...(round0.teams.faction1?.players || []), ...(round0.teams.faction2?.players || [])];
@@ -652,9 +673,17 @@
               const ps = me.player_stats || me.stats || {};
               const kills = Number(ps.Kills ?? ps['Kills'] ?? ps.K ?? 0);
               const deaths = Number(ps.Deaths ?? ps['Deaths'] ?? ps.D ?? 0);
-              kd = (ps['K/D Ratio'] ?? (deaths ? (kills/deaths).toFixed(2) : String(kills)));
+              const kdFromApi = ps['K/D Ratio'] ?? ps['K/D'] ?? ps['KD'];
+              kd = kdFromApi != null ? String(kdFromApi) : (deaths ? (kills/deaths).toFixed(2) : String(kills));
+              const krFromApi = ps['K/R Ratio'] ?? ps['K/R'] ?? ps['KR'];
+              if (krFromApi != null) {
+                kr = String(krFromApi);
+              } else {
+                const roundsPlayed = Number(ps['Rounds'] ?? ps['Played rounds'] ?? ps['Rounds Played'] ?? 0);
+                kr = roundsPlayed ? (kills/roundsPlayed).toFixed(2) : '';
+              }
             }
-            return { ...base, result, score: score || base.score || '', map: mapName || base.map || '', kd };
+            return { ...base, result, score: score || base.score || '', map: mapName || base.map || '', kd, kr };
           } catch {
             return { ...base };
           }
