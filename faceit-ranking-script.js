@@ -7,6 +7,48 @@ let playersList = [];
 let filteredPlayers = [];
 let currentFilter = 'all';
 
+// faceit-ranking-script.js
+
+// 1) Инициализация клиента
+const supabase = window.supabase.createClient(
+  window.SUPABASE_URL,
+  window.SUPABASE_ANON_KEY
+);
+
+// 2) Получаем общий рейтинг из БД
+async function fetchGlobalRating() {
+  const { data, error } = await supabase
+    .from('settings')
+    .select('value')
+    .eq('key', 'faceit_rating')
+    .single();
+
+  if (error) {
+    console.error('Failed to load rating:', error);
+    // запасное значение, если БД недоступна
+    return 1500;
+  }
+  const val = parseInt(data?.value, 10);
+  return Number.isFinite(val) ? val : 1500;
+}
+
+// 3) Применяем рейтинг ко всем игрокам на странице
+async function applyGlobalRating() {
+  const rating = await fetchGlobalRating();
+
+  // Найди элементы, где должен отображаться рейтинг.
+  // Пример: у каждого игрока есть span с классом .player-rating
+  const ratingEls = document.querySelectorAll('.player-rating');
+  ratingEls.forEach(el => {
+    el.textContent = rating;
+    el.setAttribute('aria-label', `FACEIT рейтинг: ${rating}`);
+  });
+}
+
+// 4) Запуск
+document.addEventListener('DOMContentLoaded', applyGlobalRating);
+
+
 // Переменные для сортировки
 let currentSortField = 'elo';
 let currentSortDirection = 'desc'; // desc - по убыванию, asc - по возрастанию
