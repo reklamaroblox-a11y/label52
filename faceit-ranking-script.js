@@ -7,6 +7,58 @@ let playersList = [];
 let filteredPlayers = [];
 let currentFilter = 'all';
 
+// 1. Тянем список ников из БД (Supabase)
+async function fetchNicknames() {
+  const res = await fetch("https://wpsjgygdbkvdjkikvzws.supabase.co/rest/v1/players?select=nickname,display_name,sort_order", {
+    headers: { apikey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indwc2pneWdkYmt2ZGpraWt2endzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzNDMzMDQsImV4cCI6MjA3MTkxOTMwNH0.m1DFironTn3qT9aNNnCafYs81pTPQlsCVzw79Ss1QOg" }
+  });
+  return await res.json();
+}
+
+// 2. Для каждого ника берём данные из FACEIT API
+async function fetchFaceitPlayer(nickname) {
+  const res = await fetch(`${API_URL}/players?nickname=${encodeURIComponent(nickname)}`, {
+    headers: { Authorization: `Bearer ${API_KEY}` }
+  });
+  if (!res.ok) throw new Error("FACEIT API error");
+  return await res.json();
+}
+
+// 3. Собираем таблицу
+async function loadPlayers() {
+  const tableBody = document.querySelector("#faceit-table-body");
+  tableBody.innerHTML = "<tr><td colspan='6'>Загрузка…</td></tr>";
+
+  try {
+    const players = await fetchNicknames();
+
+    tableBody.innerHTML = "";
+    for (const p of players.sort((a,b)=>a.sort_order-b.sort_order)) {
+      const info = await fetchFaceitPlayer(p.nickname);
+      const cs2 = info.games?.cs2 ?? {};
+      const elo = cs2.faceit_elo ?? "—";
+      const lvl = cs2.skill_level ?? "—";
+      const region = cs2.region ?? info.country ?? "—";
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${p.display_name}</td>
+        <td>${info.nickname}</td>
+        <td>${lvl}</td>
+        <td>${elo}</td>
+        <td>${region}</td>
+        <td>${info.steam_nickname ?? "—"}</td>
+      `;
+      tableBody.appendChild(tr);
+    }
+  } catch (err) {
+    tableBody.innerHTML = `<tr><td colspan="6">Ошибка: ${err.message}</td></tr>`;
+  }
+}
+
+document.addEventListener("DOMContentLoaded", loadPlayers);
+
+
 // Переменные для сортировки
 let currentSortField = 'elo';
 let currentSortDirection = 'desc'; // desc - по убыванию, asc - по возрастанию
