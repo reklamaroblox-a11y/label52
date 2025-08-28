@@ -9,14 +9,65 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
-    .table-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; backdrop-filter: blur(20px); }
-    .table-card table { width: 100%; border-collapse: collapse; min-width: 720px; }
-    .table-card thead th { text-align: left; font-weight: 600; font-size: 0.9rem; letter-spacing: .02em; padding: 12px 16px; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
-    .table-card tbody td { padding: 12px 16px; border-bottom: 1px dotted var(--border-color); vertical-align: middle; color: var(--text-secondary); }
-    .table-card tbody tr:last-child td { border-bottom: none; }
-    .player { display: flex; align-items: center; gap: 10px; }
-    .avatar { width: 28px; height: 28px; border-radius: 16px; object-fit: cover; border: 1px solid var(--border-color); }
-    .loading { padding: 14px; text-align: center; }
+    .table-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; backdrop-filter: blur(20px); box-shadow: var(--shadow-card); }
+    .table-card table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 720px; }
+    .table-card thead th { position: sticky; top: 0; z-index: 1; text-align: left; font-weight: 600; font-size: 0.9rem; letter-spacing: .02em; padding: 14px 18px; border-bottom: 1px solid var(--border-color); color: var(--text-primary); background: rgba(15, 15, 35, 0.9); backdrop-filter: blur(8px); }
+    .table-card tbody td { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.06); vertical-align: middle; color: var(--text-secondary); }
+    .table-card tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+    .table-card tbody tr:hover { background: rgba(99,102,241,0.08); transition: background 0.2s ease; }
+    .player { display: flex; align-items: center; gap: 12px; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-color); box-shadow: 0 0 0 2px rgba(255,255,255,0.03) inset; }
+    .loading { padding: 16px; text-align: center; }
+    .chip { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 0.85rem; line-height: 1; border: 1px solid var(--border-color); background: rgba(255,255,255,0.04); color: var(--text-primary); }
+    .chip-level { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.35); }
+    .chip-elo { background: rgba(6,182,212,0.12); border-color: rgba(6,182,212,0.35); }
+    .chip-matches { background: rgba(139,92,246,0.12); border-color: rgba(139,92,246,0.35); }
+    .btn-icon { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-primary); cursor: pointer; transition: all .2s ease; }
+    .btn-icon:hover { background: rgba(255,255,255,0.06); transform: translateY(-1px); }
+    th#sort-elo::after, th#sort-matches::after { content: '⇅'; opacity: 0.5; font-size: .8rem; margin-left: .35rem; }
+    /* Select visibility fixes */
+    #group-filter, #add-group, #edit-group { background: var(--darker-bg); color: var(--text-primary); border: 1px solid var(--border-color); }
+    #group-filter option, #add-group option, #edit-group option { background: var(--darker-bg); color: var(--text-primary); }
+    .res-win { color: #22c55e; }
+    .res-loss { color: #ef4444; }
+    .chip-winrate { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.35); }
+    /* Neutral link look */
+    .link-plain { color: var(--text-primary); text-decoration: none; }
+    .link-plain:hover { text-decoration: none; opacity: .85; }
+    /* Modal visuals */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(4,6,21,.75); backdrop-filter: blur(6px); z-index:2000; opacity:0; transition: opacity .2s ease; }
+    .modal-overlay.show { display:block; opacity:1; }
+    .modal { display:none; position:fixed; left:50%; top:50%; transform:translate(-50%,-40%); background: linear-gradient(180deg, rgba(12,12,28,.98), rgba(8,8,22,.98)); border:1px solid var(--border-color); border-radius:18px; width:min(640px, calc(100% - 2rem)); max-height:90vh; box-shadow: 0 10px 30px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,0.03) inset; overflow:hidden; z-index:2001; opacity:0; transition: transform .22s ease, opacity .22s ease; }
+    .modal.show { display:block; transform:translate(-50%,-50%); opacity:1; }
+    .modal-header { display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid var(--border-color); background: rgba(255,255,255,0.02); }
+    .modal-body { padding:18px; color: var(--text-secondary); overflow:auto; max-height: calc(90vh - 56px); overscroll-behavior: contain; }
+    .modal-footer { display:flex; gap:.5rem; justify-content:flex-end; padding:14px 18px; border-top:1px solid var(--border-color); background: rgba(255,255,255,0.02); }
+    .divider { height:1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent); margin: 8px 0; }
+    .field-label { font-size:.85rem; color: var(--text-secondary); margin-bottom:.3rem; }
+    .input { padding:.8rem 1rem; background: rgba(255,255,255,0.05); border:1px solid var(--border-color); border-radius:10px; color: var(--text-primary); width:100%; }
+    .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    .profile-head { display:flex; gap:12px; align-items:center; }
+    .profile-avatar { width:48px; height:48px; border-radius:50%; border:1px solid var(--border-color); object-fit:cover; box-shadow: 0 0 0 2px rgba(255,255,255,0.03) inset; }
+    .muted { opacity:.8; }
+    /* Stat cards */
+    .stat-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; }
+    @media (min-width: 560px) { .stat-grid { grid-template-columns: repeat(4, 1fr); } }
+    .stat-card { background: rgba(255,255,255,0.03); border:1px solid var(--border-color); border-radius:14px; padding:14px; display:grid; gap:8px; }
+    .stat-title { font-size:.9rem; color:var(--text-secondary); }
+    .stat-value { font-size:1.6rem; color:var(--text-primary); font-weight:700; letter-spacing:.02em; }
+    .stat-sub { font-size:.85rem; color:var(--text-secondary); }
+    .map-card { background: rgba(255,255,255,0.03); border:1px dashed var(--border-color); border-radius:14px; padding:12px; display:flex; justify-content:space-between; align-items:center; }
+    /* ELO-based level colors */
+    .lvl-1 { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.25); }
+    .lvl-2 { background: rgba(34,197,94,0.10); border-color: rgba(34,197,94,0.35); }
+    .lvl-3 { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.35); }
+    .lvl-4 { background: rgba(234,179,8,0.12); border-color: rgba(234,179,8,0.35); }
+    .lvl-5 { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.35); }
+    .lvl-6 { background: rgba(249,115,22,0.12); border-color: rgba(249,115,22,0.35); }
+    .lvl-7 { background: rgba(244,63,94,0.12); border-color: rgba(244,63,94,0.35); }
+    .lvl-8 { background: rgba(168,85,247,0.12); border-color: rgba(168,85,247,0.35); }
+    .lvl-9 { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.35); }
+    .lvl-10 { background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.35); }
   </style>
 </head>
 <body>
@@ -44,17 +95,19 @@
     <div class="container">
       <div class="section-header" style="display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
         <div>
-          <h2 class="section-title">FACEIT рейтинг (единый список)</h2>
-          <p class="section-subtitle">Список из БД, данные по нику из FACEIT API</p>
+          <h2 class="section-title">FACEIT рейтинг игроков</h2>
         </div>
-        <div style="display:flex; gap:.75rem; align-items:center;">
+        <div style="display:flex; gap:.75rem; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+          <div>
+            <label for="search-input" style="display:block; font-size:.85rem; color: var(--text-secondary); margin-bottom:.25rem;">Поиск по имени</label>
+            <input id="search-input" type="text" placeholder="Начните вводить..." style="padding:.55rem .8rem; background: var(--darker-bg); border:1px solid var(--border-color); color: var(--text-primary); border-radius:8px; min-width:220px;">
+          </div>
           <div>
             <label for="group-filter" style="display:block; font-size:.85rem; color: var(--text-secondary); margin-bottom:.25rem;">Фильтр по группе</label>
             <select id="group-filter" style="padding:.55rem .8rem; background: rgba(255,255,255,0.05); border:1px solid var(--border-color); color: var(--text-primary); border-radius:8px;">
               <option value="ALL">Все</option>
               <option value="Черные">Черные</option>
               <option value="Музыка">Музыка</option>
-              <option value="Без группы">Без группы</option>
             </select>
           </div>
           <button id="open-add-player" class="btn btn-secondary" title="Добавить игрока" aria-label="Добавить игрока">
@@ -72,6 +125,8 @@
                 <th scope="col">LVL</th>
                 <th scope="col" id="sort-elo" style="cursor:pointer;">ELO</th>
                 <th scope="col" id="sort-matches" style="cursor:pointer;">Матчей</th>
+                <th scope="col">Winrate</th>
+                <th scope="col">Последний матч</th>
                 <th scope="col">Действия</th>
               </tr>
             </thead>
@@ -82,7 +137,7 @@
         </div>
       </div>
 
-      <p class="section-subtitle" style="margin-top: 1rem;">Редактирование: таблица <code>public.players</code> (Supabase) — поля <code>nickname</code>, <code>display_name</code>, <code>sort_order</code>.</p>
+      
     </div>
   </section>
 
@@ -129,9 +184,12 @@
     const TABLE_BODY_ID = "faceit-table-body";
     const GROUPS = ["Без группы", "Черные", "Музыка"];
     let CURRENT_ITEMS = [];
-    let SORT_BY = null; // 'elo' | 'matches'
+    let SORT_BY = 'elo'; // 'elo' | 'matches'
     let SORT_DIR = 'desc';
     let FILTER_GROUP = 'ALL';
+    let SEARCH_QUERY = '';
+    let PAGE = 1;
+    let PAGE_SIZE = 10;
 
     // маленький лимитер параллельных запросов
     async function mapLimit(arr, limit, iter) {
@@ -149,12 +207,28 @@
       return Promise.all(ret);
     }
 
+    // UUID v4 generator for client-side ids
+    function generateUuidV4() {
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+      // fallback
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
     // 1) Читаем ЕДИНЫЙ список игроков из БД
     async function fetchPlayersList() {
-      const url = `${SUPABASE_URL}/rest/v1/players?select=nickname,display_name,sort_order,group_name&order=sort_order.asc`;
-      const res = await fetch(url, { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }});
+      // Попытка №1: c полем id (если оно есть)
+      const headers = { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` };
+      let res = await fetch(`${SUPABASE_URL}/rest/v1/players?select=id,nickname,display_name,sort_order,group_name&order=sort_order.asc`, { headers });
+      if (res.ok) return res.json();
+      // Попытка №2: без поля id (обратная совместимость)
+      res = await fetch(`${SUPABASE_URL}/rest/v1/players?select=nickname,display_name,sort_order,group_name&order=sort_order.asc`, { headers });
       if (!res.ok) throw new Error("Не удалось получить список игроков из БД");
-      return res.json();
+      const data = await res.json();
+      // создадим синтетический id на стороне клиента для стабильного ключа в UI
+      return data.map(p => ({ ...p, id: `${p.nickname || ''}::${p.display_name || ''}` }));
     }
 
     // 2) По нику — данные из FACEIT
@@ -191,7 +265,22 @@
         const data = await res.json();
         // Пытаемся извлечь количество матчей из разных возможных полей
         const life = data.lifetime || data.LIFETIME || {};
-        return Number(life.Matches || life.matches || life.Total_Matches || life["Total Matches"]) || null;
+        const matches = Number(life.Matches || life.matches || life.Total_Matches || life["Total Matches"]) || null;
+        const toNum = (v) => {
+          if (v == null) return null;
+          const n = Number(String(v).replace('%','').replace(',','.').trim());
+          return Number.isFinite(n) ? n : null;
+        };
+        const winrate = toNum(life["Win Rate %"] || life["Winrate %"] || life["WinRate %"]);
+        // Дополнительные метрики
+        let kd = toNum(life["K/D Ratio"] ?? life["K/D"] ?? life["Average K/D Ratio"] ?? life["K/D ratio"]);
+        let kr = toNum(life["K/R Ratio"] ?? life["K/R"] ?? life["Average K/R Ratio"] ?? life["K/R ratio"]);
+        const hsPct = toNum(life["Average Headshots %"] ?? life["Headshots %"] ?? life["HS %"]);
+        // sanity: if accidentally percent-like values slipped in
+        if (kd != null && kd > 10) kd = Number((kd/100).toFixed(2));
+        if (kr != null && kr > 5) kr = Number((kr/100).toFixed(2));
+        const longestWinstreak = life["Longest Win Streak"] || life["Longest Win Streaks"] || life["Win Streak"] || null;
+        return { matches, winrate, kd, kr, hsPct, longestWinstreak };
       } catch (_) {
         return null;
       }
@@ -203,24 +292,32 @@
       if (FILTER_GROUP !== 'ALL') {
         out = out.filter(x => (x.group_name || 'Без группы') === FILTER_GROUP);
       }
+      if (SEARCH_QUERY) {
+        const q = SEARCH_QUERY.toLowerCase();
+        out = out.filter(x => (x.display_name||'').toLowerCase().includes(q));
+      }
       if (SORT_BY === 'elo') {
         out.sort((a,b) => (Number(b.elo||0) - Number(a.elo||0)) * (SORT_DIR==='desc'?1:-1));
       } else if (SORT_BY === 'matches') {
         out.sort((a,b) => (Number(b.matches_count||0) - Number(a.matches_count||0)) * (SORT_DIR==='desc'?1:-1));
       }
-      return out;
+      const total = out.length;
+      const start = (PAGE-1)*PAGE_SIZE;
+      const pageItems = out.slice(start, start+PAGE_SIZE);
+      return { total, pageItems };
     }
 
     function renderRows(items) {
       const tbody = document.getElementById(TABLE_BODY_ID);
       tbody.innerHTML = "";
 
-      if (!items.length) {
+      const { total, pageItems } = applyFilterSort(items);
+      if (!total) {
         tbody.innerHTML = `<tr><td class="loading" colspan="6">Список пуст</td></tr>`;
         return;
       }
 
-      for (const row of applyFilterSort(items)) {
+      for (const row of pageItems) {
         const tr = document.createElement("tr");
 
         const avatarImg = row.avatar ? `<img class="avatar" src="${row.avatar}" alt="Аватар ${row.display_name}">` : "";
@@ -232,14 +329,16 @@
           <td>
             <div class="player">
               ${avatarImg}
-              ${profileLinkOpen}${row.display_name}${profileLinkClose}
+              ${row.faceit_url ? `<a class=\"link-plain\" href=\"${row.faceit_url}\" target=\"_blank\" rel=\"noopener\">${row.display_name}</a>` : `${row.display_name}`}
             </div>
           </td>
-          <td>${row.level ?? "—"}</td>
-          <td>${row.elo ?? "—"}</td>
-          <td>${row.matches_count ?? "—"}</td>
-          <td style="display:flex; gap:.5rem;">
-            <button class="btn btn-secondary" data-player='${safeData}'>Подробнее</button>
+          <td>${row.level != null || row.elo != null ? `<span class=\"chip chip-level ${getLevelClassByElo(row.elo)}\">LVL ${row.level ?? '?'} </span>` : '—'}</td>
+          <td>${row.elo != null ? `<span class=\"chip chip-elo\">${row.elo}</span>` : '—'}</td>
+          <td>${row.matches_count != null ? `<span class=\"chip chip-matches\">${row.matches_count}</span>` : '—'}</td>
+          <td>${row.winrate != null ? `<span class=\"chip chip-winrate\">${row.winrate}%</span>` : '—'}</td>
+          <td>${row.last_match_at ? `<span class=\"muted\">${row.last_match_at}</span>` : '—'}</td>
+          <td style=\"display:flex; gap:.5rem;\">
+            <button class=\"btn-icon\" data-player='${safeData}'><i class=\"fas fa-chart-simple\"></i><span>Подробнее</span></button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -255,6 +354,47 @@
           } catch (_) {}
         });
       });
+
+      renderPagination(total);
+    }
+
+    function renderPagination(total) {
+      let pager = document.getElementById('faceit-pager');
+      if (!pager) {
+        pager = document.createElement('div');
+        pager.id = 'faceit-pager';
+        pager.style = 'display:flex; gap:.5rem; justify-content:flex-end; margin-top:12px;';
+        document.querySelector('.table-card').after(pager);
+      }
+      const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      PAGE = Math.min(PAGE, pages);
+      let html = '';
+      html += `<button data-page="prev" class="btn-icon" ${PAGE<=1?'disabled':''}>Назад</button>`;
+      html += `<span style="align-self:center; opacity:.7;">Стр. ${PAGE} / ${pages}</span>`;
+      html += `<button data-page="next" class="btn-icon" ${PAGE>=pages?'disabled':''}>Вперёд</button>`;
+      pager.innerHTML = html;
+      pager.querySelectorAll('button[data-page]').forEach(b => {
+        b.onclick = () => {
+          const kind = b.getAttribute('data-page');
+          if (kind === 'prev' && PAGE>1) PAGE--; else if (kind==='next') PAGE++;
+          renderRows(CURRENT_ITEMS);
+        };
+      });
+    }
+
+    function getLevelClassByElo(elo) {
+      const e = Number(elo || 0);
+      if (e >= 2001) return 'lvl-10';
+      if (e >= 1751) return 'lvl-9';
+      if (e >= 1531) return 'lvl-8';
+      if (e >= 1351) return 'lvl-7';
+      if (e >= 1201) return 'lvl-6';
+      if (e >= 1051) return 'lvl-5';
+      if (e >= 901) return 'lvl-4';
+      if (e >= 751) return 'lvl-3';
+      if (e >= 501) return 'lvl-2';
+      if (e >= 100) return 'lvl-1';
+      return 'lvl-1';
     }
 
     // 4) Главная функция
@@ -267,16 +407,45 @@
         // ограничим до 3 параллельных обращений к FACEIT
         const details = await mapLimit(list, 3, async (p) => {
           const info = await fetchFaceitByNickname(p.nickname);
+          const stats = info.player_id ? await fetchMatchesCount(info.player_id) : null;
+          // derive last match date by looking up recent matches quickly (1 item)
+          let lastMatchAt = null;
+          let lastMap = null;
+          let lastResult = null;
+          let lastScore = null;
+          if (info.player_id) {
+            try {
+              const res = await fetch(`${FACEIT_API}/players/${encodeURIComponent(info.player_id)}/history?game=cs2&limit=1`, { headers: { Authorization: `Bearer ${FACEIT_API_KEY}` }});
+              if (res.ok) {
+                const d = await res.json();
+                const item = (d.items || [])[0];
+                if (item) {
+                  lastMatchAt = item.finished_at ? new Date(item.finished_at*1000).toLocaleDateString() : null;
+                  // enrich with map/result/score when opening details we'll fetch deeper
+                }
+              }
+            } catch(_) {}
+          }
           return {
+            id: p.id ?? `${p.nickname || ''}::${p.display_name || ''}`,
             display_name: p.display_name,
             nickname: info.nickname ?? p.nickname,
             level: info.level ?? null,
             elo: info.elo ?? null,
-            matches_count: info.player_id ? await fetchMatchesCount(info.player_id) : null,
+            matches_count: stats ? stats.matches : null,
+            winrate: stats ? stats.winrate : null,
+            kd: stats ? stats.kd : null,
+            kr: stats ? stats.kr : null,
+            hs_pct: stats ? stats.hsPct : null,
+            longest_winstreak: stats ? stats.longestWinstreak : null,
             steam_nickname: info.steam_nickname ?? null,
             avatar: info.avatar ?? null,
             faceit_url: info.faceit_url ?? null,
-            group_name: p.group_name || 'Без группы'
+            group_name: p.group_name || 'Без группы',
+            last_match_at: lastMatchAt,
+            last_map: lastMap,
+            last_result: lastResult,
+            last_score: lastScore
           };
         });
 
@@ -288,7 +457,7 @@
       }
     }
 
-    // Простое модальное окно для подробной статистики
+    // Простое модальное окно для подробной статистики + редактирование
     function openDetailsModal(player) {
       const modal = document.getElementById('faceit-modal');
       const overlay = document.getElementById('faceit-modal-overlay');
@@ -296,25 +465,212 @@
       const bodyEl = document.getElementById('faceit-modal-body');
 
       titleEl.textContent = player.display_name || player.nickname || 'Профиль';
-      const profileLink = player.faceit_url ? `<a href="${player.faceit_url}" target="_blank" rel="noopener">Открыть профиль Faceit</a>` : '';
+      const profileLink = player.faceit_url ? `<a class="link-plain" href="${player.faceit_url}" target="_blank" rel="noopener">Открыть профиль Faceit</a>` : '';
+      const groupOptions = GROUPS.map(g => `<option ${g === (player.group_name || 'Без группы') ? 'selected' : ''}>${g}</option>`).join('');
       bodyEl.innerHTML = `
-        <div style="display:grid; gap:.5rem;">
-          <div><strong>LVL:</strong> ${player.level ?? '—'}</div>
-          <div><strong>ELO:</strong> ${player.elo ?? '—'}</div>
-          <div><strong>Матчей:</strong> ${player.matches_count ?? '—'}</div>
-          <div>${profileLink}</div>
+        <div style="display:grid; gap:14px;">
+          <div class="profile-head">
+            ${player.avatar ? `<img class=\"profile-avatar\" src=\"${player.avatar}\" alt=\"Аватар\">` : ''}
+            <div>
+              <div style=\"font-weight:600; color:var(--text-primary);\">${player.display_name || player.nickname || 'Профиль'}</div>
+              <div class=\"muted\" style=\"font-size:.9rem;\">${player.faceit_url ? `${profileLink}` : ''}</div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div>
+              <div class="field-label">Имя</div>
+              <input id="edit-display-name" type="text" class="input" value="${(player.display_name || '').replace(/\\/g,'\\\\').replace(/"/g,'&quot;')}" />
+            </div>
+            <div>
+              <div class="field-label">Ник</div>
+              <input id="edit-nickname" type="text" class="input" value="${(player.nickname || '').replace(/\\/g,'\\\\').replace(/"/g,'&quot;')}" />
+            </div>
+          </div>
+          <div>
+            <div class="field-label">Группа</div>
+            <select id="edit-group" class="input">${groupOptions}</select>
+          </div>
+          <div class="divider"></div>
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-title">Матчей</div>
+              <div class="stat-value">${player.matches_count ?? '—'}</div>
+              <div class="stat-sub">Всего</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-title">Победы</div>
+              <div class="stat-value">${typeof player.winrate === 'number' && typeof player.matches_count === 'number' ? Math.round(player.matches_count * (player.winrate/100)) : '—'}</div>
+              <div class="stat-sub">${player.winrate != null ? `${player.winrate}%` : '—'}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-title">ELO</div>
+              <div class="stat-value">${player.elo ?? '—'}</div>
+              <div class="stat-sub">Уровень: ${player.level ?? '—'}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-title">Average Headshots</div>
+              <div class="stat-value">${player.hs_pct != null ? `${player.hs_pct}%` : '—'}</div>
+              <div class="stat-sub">Средний процент HS</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-title">Longest Win Streak</div>
+              <div class="stat-value">${player.longest_winstreak ?? '—'}</div>
+              <div class="stat-sub">Подряд</div>
+            </div>
+          </div>
+          <div id="match-list" style="margin-top:4px; display:grid; gap:6px;"></div>
+          <p id="edit-error" style="color:#f87171; margin:0;"></p>
+          <div class="modal-footer">
+            <button id="edit-delete" class="btn btn-secondary" style="border-color:#ef4444; color:#ef4444;">Удалить</button>
+            <button id="edit-save" class="btn btn-primary">Сохранить</button>
+          </div>
         </div>
       `;
 
-      overlay.style.display = 'block';
-      modal.style.display = 'block';
+      overlay.classList.add('show');
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+
+      const saveBtn = document.getElementById('edit-save');
+      const deleteBtn = document.getElementById('edit-delete');
+      const err = document.getElementById('edit-error');
+      // подгружаем 10 последних матчей
+      if (player.nickname) {
+        loadRecentMatches(player.nickname).then(rows => {
+          const host = document.getElementById('match-list');
+          if (!host) return;
+          if (!rows || !rows.length) { host.innerHTML = '<div class="muted">Нет данных о последних матчах</div>'; return; }
+          // Update quick map card info
+          const latest = rows[0];
+          if (latest) {
+            player.last_map = latest.map || player.last_map;
+            player.last_result = latest.result || player.last_result;
+            player.last_score = latest.score || player.last_score;
+          }
+          host.innerHTML = rows.map(r => `<div style="display:grid; grid-template-columns: auto 1fr auto; gap:12px; font-size:.95rem; align-items:center; padding:10px 12px; border:1px solid var(--border-color); border-radius:12px; background: rgba(255,255,255,0.03);">
+            <div class="${r.result === 'W' ? 'res-win' : 'res-loss'}" style="width:28px; text-align:center; font-weight:600;">${r.result || ''}</div>
+            <div style="display:flex; gap:12px; align-items:center;">
+              <span class="muted">${r.date}</span>
+              <span style="padding:2px 8px; border:1px solid var(--border-color); border-radius:999px;">${r.map || '—'}</span>
+              ${r.score ? `<span class=\"chip chip-matches\">${r.score}</span>` : ''}
+            </div>
+            <div style="justify-self:end; display:flex; align-items:center; gap:8px;">
+              ${r.url ? `<a class=\"link-plain\" href=\"${r.url}\" target=\"_blank\" rel=\"noopener\">детали</a>` : ''}
+            </div>
+          </div>`).join('');
+        }).catch(()=>{});
+      }
+      saveBtn.onclick = async () => {
+        err.textContent = '';
+        const newDisplay = document.getElementById('edit-display-name').value.trim();
+        const newNick = document.getElementById('edit-nickname').value.trim();
+        const newGroup = document.getElementById('edit-group').value;
+        try {
+          await updatePlayer(player.nickname, { display_name: newDisplay, nickname: newNick, group_name: newGroup });
+          // Обновим локально без полного рефетча и учтём переименование ника
+          const oldNick = player.nickname;
+          const updated = { ...player, display_name: newDisplay, nickname: newNick, group_name: newGroup };
+          CURRENT_ITEMS = CURRENT_ITEMS.map(x => x.nickname === oldNick ? updated : x);
+          // Перезапишем ссылку player для текущей модалки (на будущее)
+          Object.assign(player, updated);
+          closeDetailsModal();
+          renderRows(CURRENT_ITEMS);
+        } catch(ex) {
+          err.textContent = ex.message || 'Не удалось сохранить';
+        }
+      };
+      deleteBtn.onclick = async () => {
+        err.textContent = '';
+        if (!confirm(`Удалить игрока "${player.display_name || player.nickname}"?`)) return;
+        try {
+          await deletePlayerById(player.id, player.nickname);
+          closeDetailsModal();
+          CURRENT_ITEMS = CURRENT_ITEMS.filter(x => x.id !== player.id);
+          renderRows(CURRENT_ITEMS);
+        } catch(ex) {
+          err.textContent = ex.message || 'Не удалось удалить';
+        }
+      };
+    }
+
+    async function loadRecentMatches(nickname) {
+      try {
+        const resInfo = await fetch(`${FACEIT_API}/players?nickname=${encodeURIComponent(nickname)}`, { headers: { Authorization: `Bearer ${FACEIT_API_KEY}` }});
+        if (!resInfo.ok) return [];
+        const info = await resInfo.json();
+        const playerId = info.player_id;
+        if (!playerId) return [];
+        const res = await fetch(`${FACEIT_API}/players/${encodeURIComponent(playerId)}/history?game=cs2&limit=10`, { headers: { Authorization: `Bearer ${FACEIT_API_KEY}` }});
+        if (!res.ok) return [];
+        const data = await res.json();
+        const items = (data.items || []).slice(0, 10);
+        const rows = await mapLimit(items, 3, async (m) => {
+          // базовые данные из истории (fallback, если детальная выборка не даст больше)
+          const base = {
+            url: m.match_id ? `https://www.faceit.com/ru/cs2/room/${m.match_id}` : (m.faceit_url || ''),
+            date: m.finished_at ? new Date(m.finished_at*1000).toLocaleDateString() : '',
+            map: (m.rounds && m.rounds[0] && (m.rounds[0].round_stats?.Map || m.rounds[0].map)) || m.map || '',
+            score: (m.results && (m.results.score || m.results.Score)) || ''
+          };
+          try {
+            const mdRes = await fetch(`${FACEIT_API}/matches/${encodeURIComponent(m.match_id)}`, { headers: { Authorization: `Bearer ${FACEIT_API_KEY}` }});
+            if (!mdRes.ok) return { ...base };
+            const md = await mdRes.json();
+            const teams = md.teams || {};
+            const f1 = teams.faction1 || {};
+            const f2 = teams.faction2 || {};
+            const f1Players = (f1.players || []).map(p => (p.nickname || p.nick || '').toLowerCase());
+            const playerFaction = f1Players.includes(nickname.toLowerCase()) ? 'faction1' : 'faction2';
+            const winner = (md.results && md.results.winner) || '';
+            const result = winner ? (winner === playerFaction ? 'W' : 'L') : '';
+            // Map and per-map score from rounds
+            const round0 = md.rounds && md.rounds[0] ? md.rounds[0] : {};
+            const rs = round0.round_stats || {};
+            let mapName = rs.Map || rs.map || rs.MAP || rs['Map name'] || round0.map || md.map || base.map || '';
+            let score = rs['Score After Overtime'] || rs['Final Score'] || rs.Score || '';
+            if (!score) {
+              const r = md.results || {};
+              if (typeof r.score === 'string') score = r.score;
+              if (!score && typeof r.Score === 'string') score = r.Score;
+              if (!score && r.score && typeof r.score === 'object') {
+                const s = r.score; const a = Number(s.faction1 || s.Faction1 || s.TeamA || 0); const b = Number(s.faction2 || s.Faction2 || s.TeamB || 0);
+                if (Number.isFinite(a) && Number.isFinite(b)) score = `${a}:${b}`;
+              }
+            }
+
+            // K/D: search in rounds[0].players or teams players stats
+            let kd = '';
+            let playersArr = (round0.players || []);
+            if (!playersArr.length && round0.teams) {
+              playersArr = [...(round0.teams.faction1?.players || []), ...(round0.teams.faction2?.players || [])];
+            }
+            if (!playersArr.length) {
+              playersArr = [...(f1.players || []), ...(f2.players || [])];
+            }
+            const me = playersArr.find(p => ((p.nickname || p.player_nickname || p.name || '').toLowerCase()) === nickname.toLowerCase());
+            if (me) {
+              const ps = me.player_stats || me.stats || {};
+              const kills = Number(ps.Kills ?? ps['Kills'] ?? ps.K ?? 0);
+              const deaths = Number(ps.Deaths ?? ps['Deaths'] ?? ps.D ?? 0);
+              kd = (ps['K/D Ratio'] ?? (deaths ? (kills/deaths).toFixed(2) : String(kills)));
+            }
+            return { ...base, result, score: score || base.score || '', map: mapName || base.map || '', kd };
+          } catch {
+            return { ...base };
+          }
+        });
+        return rows;
+      } catch(_) {
+        return [];
+      }
     }
 
     function closeDetailsModal() {
       const modal = document.getElementById('faceit-modal');
       const overlay = document.getElementById('faceit-modal-overlay');
-      overlay.style.display = 'none';
-      modal.style.display = 'none';
+      overlay.classList.remove('show');
+      modal.classList.remove('show');
+      document.body.style.overflow = '';
     }
 
     document.addEventListener('click', (e) => {
@@ -329,20 +685,42 @@
         SORT_BY = 'elo';
         SORT_DIR = SORT_DIR === 'desc' ? 'asc' : 'desc';
         renderRows(CURRENT_ITEMS);
+        updateSortIndicators();
       } else if (e.target && e.target.id === 'sort-matches') {
         SORT_BY = 'matches';
         SORT_DIR = SORT_DIR === 'desc' ? 'asc' : 'desc';
         renderRows(CURRENT_ITEMS);
+        updateSortIndicators();
+      } else if (e.target && (e.target.id === 'open-add-player' || e.target.closest && e.target.closest('#open-add-player'))) {
+        // Делегирование: клик по иконке внутри делает кнопку кликабельной целиком
+        openAddPlayerModal();
       }
     });
 
-    // Фильтр по группе
+    // Фильтр/поиск
     document.addEventListener('change', (e) => {
       if (e.target && e.target.id === 'group-filter') {
         FILTER_GROUP = e.target.value;
         renderRows(CURRENT_ITEMS);
       }
     });
+    document.addEventListener('input', (e) => {
+      if (e.target && e.target.id === 'search-input') {
+        SEARCH_QUERY = e.target.value;
+        PAGE = 1;
+        renderRows(CURRENT_ITEMS);
+      }
+    });
+
+    function updateSortIndicators() {
+      const eloTh = document.getElementById('sort-elo');
+      const mTh = document.getElementById('sort-matches');
+      eloTh.textContent = 'ELO';
+      mTh.textContent = 'Матчей';
+      const arrow = SORT_DIR === 'desc' ? ' ↓' : ' ↑';
+      if (SORT_BY === 'elo') eloTh.textContent += arrow;
+      if (SORT_BY === 'matches') mTh.textContent += arrow;
+    }
 
     // Модалка добавления игрока
     document.addEventListener('click', (e) => {
@@ -355,7 +733,8 @@
       if (!display_name || !nickname) throw new Error('Введите имя и ник');
       // Ограничим sort_order значением в секундах, чтобы поместиться в INT32
       const sortOrder = Math.min(2147483647, Math.floor(Date.now() / 1000));
-      const body = [{ display_name, nickname, group_name, sort_order: sortOrder }];
+      const id = generateUuidV4();
+      const body = [{ id, display_name, nickname, group_name, sort_order: sortOrder }];
       const res = await fetch(`${SUPABASE_URL}/rest/v1/players`, {
         method: 'POST',
         headers: {
@@ -373,11 +752,80 @@
       return res.json();
     }
 
+    async function updatePlayer(oldNickname, { display_name, nickname, group_name }) {
+      if (!oldNickname) throw new Error('Неизвестный игрок');
+      const body = { display_name, nickname, group_name };
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/players?nickname=eq.${encodeURIComponent(oldNickname)}`, {
+        method: 'PATCH',
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) {
+        const t = await res.text().catch(()=>"");
+        throw new Error('Не удалось сохранить изменения. ' + t);
+      }
+      // PATCH может вернуть 204 No Content → не вызывать res.json()
+      let out = null;
+      try { out = await res.json(); } catch(_) { out = null; }
+      return out;
+    }
+
+    async function deletePlayerById(id, nickname) {
+      if (id == null && !nickname) throw new Error('Неизвестный игрок');
+      // 1) Пытаемся удалить по id, если он есть в таблице
+      if (id != null) {
+        const urlById = `${SUPABASE_URL}/rest/v1/players?id=eq.${encodeURIComponent(id)}`;
+        const resById = await fetch(urlById, {
+          method: 'DELETE',
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            Prefer: 'return=representation'
+          }
+        });
+        if (!resById.ok) {
+          const t = await resById.text().catch(()=>"");
+          throw new Error('Не удалось удалить. ' + t);
+        }
+        let rowsById = [];
+        try { rowsById = await resById.json(); } catch (_) { rowsById = []; }
+        if (Array.isArray(rowsById) && rowsById.length > 0) return true;
+        // Если 0 записей — возможно, в БД нет реального поля id. Пойдём по нику.
+      }
+      if (!nickname) {
+        throw new Error('Удаление не подтвердилось на сервере (0 записей). Проверь политики RLS и уникальность поля nickname.');
+      }
+      const urlByNick = `${SUPABASE_URL}/rest/v1/players?nickname=eq.${encodeURIComponent(nickname)}`;
+      const resByNick = await fetch(urlByNick, {
+        method: 'DELETE',
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          Prefer: 'return=representation'
+        }
+      });
+      if (!resByNick.ok) {
+        const t = await resByNick.text().catch(()=>"");
+        throw new Error('Не удалось удалить. ' + t);
+      }
+      let rowsByNick = [];
+      try { rowsByNick = await resByNick.json(); } catch (_) { rowsByNick = []; }
+      if (!Array.isArray(rowsByNick) || rowsByNick.length === 0) {
+        throw new Error('Удаление не подтвердилось на сервере (0 записей). Проверь политики RLS и уникальность поля nickname.');
+      }
+      return true;
+    }
+
     function openAddPlayerModal() {
       const overlay = document.getElementById('faceit-add-overlay');
       const modal = document.getElementById('faceit-add-modal');
       overlay.style.display = 'block';
       modal.style.display = 'block';
+      document.body.style.overflow = 'hidden';
     }
 
     function closeAddPlayerModal() {
@@ -385,6 +833,7 @@
       const modal = document.getElementById('faceit-add-modal');
       overlay.style.display = 'none';
       modal.style.display = 'none';
+      document.body.style.overflow = '';
     }
 
     document.addEventListener('click', async (e) => {
@@ -411,18 +860,18 @@
   </script>
 
   <!-- Модальное окно -->
-  <div id="faceit-modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6);"></div>
-  <div id="faceit-modal" style="display:none; position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); background: var(--card-bg); border:1px solid var(--border-color); border-radius:16px; width:min(560px, calc(100% - 2rem)); box-shadow: var(--shadow-card); overflow:hidden;">
-    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid var(--border-color);">
+  <div id="faceit-modal-overlay" class="modal-overlay"></div>
+  <div id="faceit-modal" class="modal">
+    <div class="modal-header">
       <h3 id="faceit-modal-title" style="margin:0;">Подробная статистика</h3>
       <button id="faceit-modal-close" class="btn btn-secondary">Закрыть</button>
     </div>
-    <div id="faceit-modal-body" style="padding:16px; color: var(--text-secondary);"></div>
+    <div id="faceit-modal-body" class="modal-body"></div>
   </div>
 
   <!-- Добавление игрока -->
-  <div id="faceit-add-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6);"></div>
-  <div id="faceit-add-modal" style="display:none; position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); background: var(--card-bg); border:1px solid var(--border-color); border-radius:16px; width:min(560px, calc(100% - 2rem)); box-shadow: var(--shadow-card); overflow:hidden;">
+  <div id="faceit-add-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); backdrop-filter: blur(2px); z-index:2000;"></div>
+  <div id="faceit-add-modal" style="display:none; position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); background: rgba(10,10,26,0.98); border:1px solid var(--border-color); border-radius:16px; width:min(560px, calc(100% - 2rem)); box-shadow: var(--shadow-card); overflow:hidden; z-index:2001;">
     <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid var(--border-color);">
       <h3 style="margin:0;">Добавить игрока</h3>
       <button id="faceit-add-close" class="btn btn-secondary">Закрыть</button>
