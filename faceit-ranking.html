@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FACEIT Рейтинг - LABEL 52</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="faceit-ranking-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2><a href="index.html" style="color: inherit; text-decoration: none;">LABEL 52</a></h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Главная</a></li>
+                <li><a href="faceit-ranking.html" class="nav-link active">FACEIT Рейтинг</a></li>
+                <li><a href="spotify-stats.html" class="nav-link">Spotify Статистика</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Главный контент -->
+    <main class="main-content">
+        <!-- Заголовок страницы -->
+        <section class="page-header">
+            <div class="container">
+                <h1 class="page-title">
+                    <span class="gradient-text">FACEIT</span> Рейтинг
+                </h1>
+                <p class="page-description">
+                    Отслеживайте статистику ваших друзей в CS2
+                </p>
+            </div>
+        </section>
+
+        <!-- Фильтры и поиск -->
+        <section class="filters-section">
+            <div class="container">
+                <div class="filters-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="player-search" placeholder="Поиск игрока...">
+                    </div>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all">Все</button>
+                        <button class="filter-btn" data-filter="music">Музыка</button>
+                        <button class="filter-btn" data-filter="black">Черные</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Рейтинг игроков -->
+        <section class="ranking-section">
+            <div class="container">
+                <div class="ranking-header">
+                    <h2>Рейтинг игроков</h2>
+                    <div class="ranking-stats">
+                        <span class="stat-item">
+                            <i class="fas fa-users"></i>
+                            <span id="total-players">0</span> игроков
+                        </span>
+
+                    </div>
+                </div>
+
+                <div class="ranking-table-container">
+                    <table class="ranking-table">
+                        <thead>
+                            <tr>
+                                <th>Место</th>
+                                <th>Игрок</th>
+                                <th class="sortable" data-sort="elo">
+                                    ELO
+                                    <i class="fas fa-sort sort-icon"></i>
+                                </th>
+                                <th>Уровень</th>
+                                <th class="sortable" data-sort="matches">
+                                    Матчи
+                                    <i class="fas fa-sort sort-icon"></i>
+                                </th>
+                                <th class="sortable" data-sort="wins">
+                                    Победы
+                                    <i class="fas fa-sort sort-icon"></i>
+                                </th>
+                
+                                <th class="sortable" data-sort="lastMatch">
+                                    Последний матч
+                                    <i class="fas fa-sort sort-icon"></i>
+                                </th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ranking-tbody">
+                            <!-- Данные будут загружены через JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Загрузка -->
+                <div id="loading-spinner" class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>Загрузка рейтинга...</p>
+                </div>
+
+                <!-- Пустое состояние -->
+                <div id="empty-state" class="empty-state" style="display: none;">
+                    <i class="fas fa-users-slash"></i>
+                    <h3>Нет данных</h3>
+                    <p>Добавьте игроков в настройках для отображения рейтинга</p>
+                    <button class="btn btn-primary" onclick="openSettings()">
+                        <i class="fas fa-cog"></i>
+                        Настройки
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Модальное окно настроек -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Настройки игроков</h3>
+                <button id="modal-close" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="add-player-nickname">Добавить игрока:</label>
+                                <div class="input-group">
+                <input type="text" id="add-player-nickname" placeholder="FACEIT никнейм">
+                <div class="group-selector">
+                    <label for="add-player-group">Группа:</label>
+                    <select id="add-player-group" class="group-select">
+                        <option value="">Без группы</option>
+                        <option value="music">🎵 Музыка</option>
+                        <option value="black">⚫ Черные</option>
+                    </select>
+                </div>
+                <button id="add-player-btn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Добавить
+                </button>
+            </div>
+                </div>
+
+                <div class="players-list">
+                    <h4>Текущие игроки:</h4>
+                    <div id="players-list-container">
+                        <!-- Список игроков будет загружен динамически -->
+                    </div>
+                </div>
+
+                <div class="nickname-hints">
+                    <p><strong>Попробуйте известных игроков:</strong></p>
+                    <div class="hint-tags">
+                        <span class="hint-tag" data-nickname="ZywOo">ZywOo</span>
+                        <span class="hint-tag" data-nickname="sh1ro">sh1ro</span>
+                        <span class="hint-tag" data-nickname="ropz">ropz</span>
+                        <span class="hint-tag" data-nickname="broky">broky</span>
+                        <span class="hint-tag" data-nickname="Twistzz">Twistzz</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Кнопка настроек -->
+    <button id="settings-btn" class="settings-btn">
+        <i class="fas fa-cog"></i>
+    </button>
+
+    <!-- Скрипты -->
+    <script src="faceit-ranking-script.js"></script>
+</body>
+</html>
