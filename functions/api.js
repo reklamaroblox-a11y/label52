@@ -1,14 +1,15 @@
 const axios = require('axios');
 
-// Конфигурация API
+// Конфигурация API - используем прокси-сервер RoyaleAPI
 const CLASH_ROYALE_API_TOKEN = process.env.CLASH_ROYALE_API_TOKEN;
-const API_BASE_URL = 'https://api.clashroyale.com/v1';
+const API_BASE_URL = 'https://proxy.royaleapi.dev/v1';
 
 exports.handler = async (event, context) => {
     // Логирование для диагностики
     console.log('🔍 API Function вызвана');
     console.log('📝 Token present:', !!process.env.CLASH_ROYALE_API_TOKEN);
     console.log('🌐 Request path:', event.path);
+    console.log('🔗 Using proxy:', API_BASE_URL);
     
     // CORS заголовки
     const headers = {
@@ -30,7 +31,7 @@ exports.handler = async (event, context) => {
         const path = event.path.replace('/.netlify/functions/api', '');
         const url = `${API_BASE_URL}${path}`;
         
-        console.log(`Запрос к API: ${url}`);
+        console.log(`Запрос к прокси API: ${url}`);
         
         const response = await axios.get(url, {
             headers: {
@@ -59,7 +60,10 @@ exports.handler = async (event, context) => {
             message = 'Игрок не найден. Проверьте правильность тега.';
         } else if (error.response?.status === 403) {
             statusCode = 403;
-            message = 'Ошибка доступа к API. Попробуйте позже.';
+            message = 'Ошибка доступа к API. Проверьте API ключ и попробуйте позже.';
+        } else if (error.response?.status === 429) {
+            statusCode = 429;
+            message = 'Превышен лимит запросов к API. Попробуйте позже.';
         }
         
         return {
