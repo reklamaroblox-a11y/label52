@@ -353,7 +353,9 @@
 
     async function insertPlayer({ display_name, nickname, group_name }) {
       if (!display_name || !nickname) throw new Error('Введите имя и ник');
-      const body = [{ display_name, nickname, group_name, sort_order: Date.now() }];
+      // Ограничим sort_order значением в секундах, чтобы поместиться в INT32
+      const sortOrder = Math.min(2147483647, Math.floor(Date.now() / 1000));
+      const body = [{ display_name, nickname, group_name, sort_order: sortOrder }];
       const res = await fetch(`${SUPABASE_URL}/rest/v1/players`, {
         method: 'POST',
         headers: {
