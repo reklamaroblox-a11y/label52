@@ -63,6 +63,40 @@
         </div>
     </section>
 
+    <!-- Секция пользователей -->
+    <section id="users" class="releases">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Пользователи</h2>
+                <p class="section-subtitle">Общая таблица с никнеймом и группой (Supabase)</p>
+            </div>
+
+            <div id="users-controls" style="margin-bottom: 1rem; display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                <input id="nickname-input" type="text" placeholder="Никнейм" class="form-input" style="padding: 0.8rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-primary);">
+                <input id="group-input" type="text" placeholder="Группа" class="form-input" style="padding: 0.8rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-primary);">
+                <button id="add-user-btn" class="btn btn-primary" style="width: 100%">Добавить</button>
+            </div>
+
+            <div style="overflow-x:auto;">
+                <table id="users-table" style="width:100%; border-collapse: collapse; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden;">
+                    <thead style="background: rgba(255,255,255,0.04);">
+                        <tr>
+                            <th style="text-align:left; padding: 12px 16px; border-bottom: 1px solid var(--border-color);">Никнейм</th>
+                            <th style="text-align:left; padding: 12px 16px; border-bottom: 1px solid var(--border-color);">Группа</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-tbody">
+                        <tr>
+                            <td style="padding: 12px 16px; color: var(--text-secondary);" colspan="2">Загрузка...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p id="users-error" style="color:#f87171; margin-top: 0.75rem; display:none;"></p>
+        </div>
+    </section>
+
     <!-- Секция артистов -->
     <section id="artists" class="artists">
         <div class="container">
@@ -204,6 +238,8 @@
         </div>
     </footer>
 
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
+    <script src="users.js"></script>
 </body>
 </html>
